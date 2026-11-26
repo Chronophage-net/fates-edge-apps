@@ -19,9 +19,9 @@
 
 import { t as i18nText } from '@core/i18n.js';
 import { getCharacter, updateCharacter, addRoll, saveState, getState, getMacros, addMacro, deleteMacro } from '@core/state.js';
-import { performRoll } from '@core/dice.js';
+import { performRoll, shiftPosition, capPool } from '@core/dice.js';
 import { showToast } from '@components/Toast.js';
-import { escHtml, safeParseInt, clamp } from '@core/utils.js';
+import { escHtml, safeParseInt, clamp, maxPoolForXp } from '@core/utils.js';
 import { collectTalentModifiers, collectEquipmentModifiers, consumeTalentCharge } from '@core/talent-effects.js';
 import { playDiceAnimation } from '@components/Dice3D.js';
 
@@ -39,9 +39,9 @@ const ALL_SKILLS = [
     { name: 'Sway', attr: 'presence', desc: 'Persuasion, negotiation, charm, leadership, orders, intimidation' },
     { name: 'Deception', attr: 'presence', desc: 'Lying, bluffing, disguise, forgery, covert social maneuvering' },
     { name: 'Performance', attr: 'presence', desc: 'Singing, acting, oration, public speaking, musical display' },
-    { name: 'Insight', attr: 'spirit', desc: 'Reading people, ground, evidence, tracks, weather; deduction' },
+    { name: 'Insight', attr: 'wits', desc: 'Reading people, ground, evidence, tracks, weather; deduction' },
     { name: 'Lore', attr: 'wits', desc: 'History, custom, religion, law, legend, local knowledge, rites' },
-    { name: 'Arcana', attr: 'spirit', desc: 'Magic theory, identifying spells and wards, counterspelling, free casting' }
+    { name: 'Arcana', attr: 'wits', desc: 'Magic theory, identifying spells and wards, counterspelling, free casting' }
 ];
 
 const ATTRIBUTES = [
@@ -297,7 +297,7 @@ function getEffectivePosition(basePosition, fatigue, fatigueMax) {
 /**
  * Calculate dice pool with all modifiers
  */
-function calculateDicePool(attr, skill, options = {}) {
+export function calculateDicePool(attr, skill, options = {}) {
     const {
         fatigue = 0,
         fatigueMax = 0,
@@ -338,33 +338,29 @@ function calculateDicePool(attr, skill, options = {}) {
     const effectiveFatigue = Math.max(0, fatigue - (talentMods.ignoredFatigue || 0));
     const effectiveHarm = Math.max(0, harm - (talentMods.ignoredHarm || 0));
 
-    // Fatigue: worsens position or -1 die if already desperate
-    if (effectiveFatigue > 0) {
-        positionAfterFatigue = getEffectivePosition(position, effectiveFatigue, fatigueMax);
-        if (positionAfterFatigue === 'desperate' && position === 'desperate') {
-            // Already desperate: -1 die per fatigue beyond what worsened position
-            const fatigueOverDesperate = effectiveFatigue - (2 - order_index(position));
-            if (fatigueOverDesperate > 0) {
-                fatiguePenalty = fatigueOverDesperate;
-                pool -= fatiguePenalty;
-                diceModifiers.push(`Fatigue: −${fatiguePenalty}d`);
-            }
-        }
-        if (positionAfterFatigue !== position) {
-            diceModifiers.push(`Fatigue: ${position} → ${positionAfterFatigue}`);
-        }
-    }
-
-    // Talent Position shift (e.g. "improve Position by 1 step"), applied after fatigue
-    if (talentMods.positionShift) {
-        const order = ['desperate', 'controlled', 'dominant'];
-        let idx = order.indexOf(positionAfterFatigue);
-        idx = clamp(idx + talentMods.positionShift, 0, order.length - 1);
-        const shifted = order[idx];
-        if (shifted !== positionAfterFatigue) {
-            diceModifiers.push(`Talent: Position → ${shifted}`);
-            positionAfterFatigue = shifted;
-        }
+    // Position. SRD 02 and 09: each point of Fatigue worsens Position one step,
+    // each Boon spent before the roll improves it one step, and a talent may
+    // shift it. These are summed into one net shift from the starting
+    // Position; steps past Dominant become +1 die each and steps past
+    // Desperate -1 die each. (Previously Boons were +1 die apiece, talent
+    // shifts were clamped, and Fatigue only cost dice when the roll had
+    // *started* Desperate -- a Controlled roll with 3 Fatigue lost two steps.)
+    const boonSteps = Math.max(0, Number(boonDice) || 0);
+    const talentSteps = Number(talentMods.positionShift) || 0;
+    const netSteps = boonSteps + talentSteps - effectiveFatigue;
+    const shifted = shiftPosition(position, netSteps);
+    positionAfterFatigue = shifted.position;
+    if (effectiveFatigue > 0) diceModifiers.push(`Fatigue ${effectiveFatigue}: −${effectiveFatigue} step${effectiveFatigue === 1 ? '' : 's'}`);
+    if (boonSteps > 0) diceModifiers.push(`Boon ${boonSteps}: +${boonSteps} step${boonSteps === 1 ? '' : 's'}`);
+    if (talentSteps) diceModifiers.push(`Talent: ${talentSteps > 0 ? '+' : ''}${talentSteps} step${Math.abs(talentSteps) === 1 ? '' : 's'}`);
+    if (positionAfterFatigue !== position) diceModifiers.push(`Position: ${position} → ${positionAfterFatigue}`);
+    if (shifted.diceDelta > 0) {
+        pool += shifted.diceDelta;
+        diceModifiers.push(`Beyond Dominant: +${shifted.diceDelta}d`);
+    } else if (shifted.diceDelta < 0) {
+        fatiguePenalty = -shifted.diceDelta;
+        pool += shifted.diceDelta;
+        diceModifiers.push(`Beyond Desperate: −${fatiguePenalty}d`);
     }
 
     // Harm penalties
@@ -372,8 +368,9 @@ function calculateDicePool(attr, skill, options = {}) {
         pool -= 1;
         diceModifiers.push('Harm 1: −1d');
     } else if (effectiveHarm === 2) {
-        pool -= 2;
-        diceModifiers.push('Harm 2: −2d');
+        // SRD 09: Harm 2 is "-1 die on most actions until treated" (not -2).
+        pool -= 1;
+        diceModifiers.push('Harm 2: −1d');
     } else if (effectiveHarm >= 3) {
         return { pool: 0, diceModifiers: ['Harm 3: Incapacitated'], positionAfterFatigue, incapacitated: true, talentMods };
     }
@@ -397,15 +394,16 @@ function calculateDicePool(attr, skill, options = {}) {
         diceModifiers.push(`Assist: +${assist}d`);
     }
 
-    // Boon-spent dice (re-rolls are handled separately, but pre-roll boon spent on +1d)
-    if (boonDice > 0) {
-        pool += boonDice;
-        diceModifiers.push(`Boon: +${boonDice}d`);
-    }
-
     pool = Math.max(0, pool);
 
     return { pool, diceModifiers, positionAfterFatigue, incapacitated: false, talentMods };
+}
+
+// SRD 15: Tier I caps the pool at 8, Tier II at 9, higher tiers at 10
+// (core/utils.js TIERS). Unknown XP -> the general 10-die maximum.
+function maxPoolFor(character) {
+    const xp = Number(character?.totalXp);
+    return Number.isFinite(xp) ? maxPoolForXp(xp) : 10;
 }
 
 function order_index(position) {
@@ -513,11 +511,9 @@ function executeRoll(attr, skill, dv, position, boonsSpent, characterData = {}) 
         armorType = null, weaponClass = null, weaponTags = null, weaponRange = null, shieldType = null, physicalSkill = false
     } = characterData;
 
-    // Calculate pool with modifiers. boonsSpent becomes +1d/boon here — this
-    // was previously dropped on the floor (executeRoll received it but never
-    // forwarded it to calculateDicePool's boonDice), even though the Quick
-    // Roller's "Boons to Spend" field always described itself as "+1d from
-    // boon." Fixed as part of the Fatigue-as-Boon work below.
+    // Calculate pool with modifiers. Each Boon spent improves Position by one
+    // step (SRD 02); only steps past Dominant become dice -- see
+    // calculateDicePool.
     const poolInfo = calculateDicePool(attr, skill, {
         fatigue, fatigueMax, harm, position, assistDice, boonDice: boonsSpent || 0,
         character, attrKey, skillKey, armorType, weaponClass, weaponTags, weaponRange, shieldType, physicalSkill
@@ -542,7 +538,9 @@ function executeRoll(attr, skill, dv, position, boonsSpent, characterData = {}) 
         };
     }
 
-    const pool = poolInfo.pool;
+    // SRD: max 10d10 (8 at Tier I, 9 at Tier II); every die beyond the cap is
+    // an automatic success.
+    const { pool, autoSuccesses } = capPool(poolInfo.pool, maxPoolFor(character));
     if (pool < 1) {
         return null;
     }
@@ -559,6 +557,7 @@ function executeRoll(attr, skill, dv, position, boonsSpent, characterData = {}) 
     // Count results. Successes come from the final dice; Story Beats do NOT —
     // see storyBeatsFor().
     let counts = countResults(dice);
+    counts.successes += autoSuccesses;
     counts.storyBeats = storyBeatsFor(rawDice, reRolledDice);
 
     // Determine outcome
@@ -578,6 +577,7 @@ function executeRoll(attr, skill, dv, position, boonsSpent, characterData = {}) 
             reRolledDice.push({ index: failIdx, old: oldVal, new: newVal, talent: true });
         }
         counts = countResults(dice);
+        counts.successes += autoSuccesses;
         counts.storyBeats = storyBeatsFor(rawDice, reRolledDice);
         outcome = determineOutcome(counts.successes, dv, counts.storyBeats);
     }
@@ -612,6 +612,7 @@ function executeRoll(attr, skill, dv, position, boonsSpent, characterData = {}) 
         tens: counts.tens,
         failures: counts.failures,
         pool,
+        autoSuccesses,
         position: position,
         effectivePosition: poolInfo.positionAfterFatigue,
         reRolledDice,
@@ -951,8 +952,8 @@ export function customRoll(config = {}) {
         return null;
     }
     
-    if (boons < 0 || boons > 5) {
-        if (!silent) showToast(i18nText("feature.characters.roller.boonsMustBeBetween0And5", null, "Boons must be between 0 and 5."), 'error');
+    if (boons < 0 || boons > 7) { // SRD: up to 7 Boons held at Tier V
+        if (!silent) showToast(i18nText("feature.characters.roller.boonsMustBeBetween0And5", null, "Boons must be between 0 and 7."), 'error');
         return null;
     }
     
@@ -1101,7 +1102,7 @@ export async function renderRollerUI(el) {
                     </div>
                     <div class="field">
                         <label data-i18n="feature.characters.roller.boonsToSpend">Boons to Spend</label>
-                        <input type="number" id="roller-boons" value="0" min="0" max="5" title="Pre-roll boon spend (e.g., +1d from boon)" / data-i18n-attr="title:feature.characters.roller.preRollBoonSpendEG1d">
+                        <input type="number" id="roller-boons" value="0" min="0" max="7" title="Boons spent before the roll: each improves Position one step (past Dominant, +1 die)" / data-i18n-attr="title:feature.characters.roller.preRollBoonSpendEG1d">
                     </div>
                     <div class="field">
                         <label data-i18n="feature.characters.roller.assistDice">Assist Dice</label>

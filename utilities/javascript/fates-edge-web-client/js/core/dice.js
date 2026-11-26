@@ -1,3 +1,4 @@
+import { TIERS } from './utils.js';
 /**
  * Core Dice Engine - Fate's Edge Resolution System
  * 
@@ -173,6 +174,46 @@ const defaultSkills = [
 // ============================================================
 // OUTCOME CONSTANTS (NEW for VTT automation)
 // ============================================================
+
+// ============================================================
+// POSITION LADDER AND POOL CAP (SRD 02, Position & Effect; Maximum Dice Pool)
+// ============================================================
+
+/** Position from worst to best. */
+export const POSITIONS = ['desperate', 'controlled', 'dominant'];
+
+/** SRD: "Maximum die pool = 10d10." Tiers I and II cap lower (8, 9). */
+export const MAX_POOL = 10;
+// Per-Tier caps come from the one SRD tier table in core/utils.js.
+export const TIER_MAX_POOL = Object.fromEntries(TIERS.map(t => [t.tier, t.maxPool]));
+
+/**
+ * Move a Position by a number of steps (positive improves, negative worsens).
+ * SRD: "If bonuses would raise Position above Dominant, each extra step becomes
+ * +1 die. If penalties would drop Position below Desperate, each extra step
+ * becomes -1 die." Spent Boons, talent shifts and Fatigue should be summed into
+ * one net shift first, so that opposing steps cancel instead of one of them
+ * leaking into dice.
+ * @returns {{position: string, diceDelta: number}}
+ */
+export function shiftPosition(position, steps = 0) {
+    let idx = POSITIONS.indexOf(position);
+    if (idx === -1) idx = 1;
+    const target = idx + (Number(steps) || 0);
+    if (target > POSITIONS.length - 1) return { position: 'dominant', diceDelta: target - (POSITIONS.length - 1) };
+    if (target < 0) return { position: 'desperate', diceDelta: target };
+    return { position: POSITIONS[target], diceDelta: 0 };
+}
+
+/**
+ * Cap a pool. SRD: "Any additional dice beyond 10 become automatic successes
+ * (1 auto-success per extra die)."
+ * @returns {{pool: number, autoSuccesses: number}}
+ */
+export function capPool(pool, max = MAX_POOL) {
+    const cap = Number.isFinite(max) && max > 0 ? max : MAX_POOL;
+    return { pool: Math.min(pool, cap), autoSuccesses: Math.max(0, pool - cap) };
+}
 
 export const OUTCOME_CODES = {
     CLEAN: 'clean',
@@ -478,13 +519,21 @@ function performDicePoolRoll(pool, dv, options = {}) {
  * @returns {Object} Full roll result
  */
 function performRoll(attr, skill, dv, position = 'controlled', boons = 0, options = {}) {
-    const basePool = Math.max(1, attr + skill);
-    const pool = Math.min(basePool + boons, 12); // Cap at 12 dice
-    
+    // A spent Boon improves Position by one step (SRD: "Player may spend 1 Boon
+    // before rolling to improve Position by one step"); only steps past
+    // Dominant become dice. This used to add every Boon straight to the pool.
+    const requestedPosition = position;
+    const shift = shiftPosition(position, (Number(boons) || 0) + (Number(options.positionSteps) || 0));
+    position = shift.position;
+    const basePool = Math.max(1, (Number(attr) || 0) + (Number(skill) || 0) + shift.diceDelta);
+    // SRD: max 10d10 (lower at Tiers I-II); extra dice are automatic successes.
+    // The old cap was 12 dice, with anything beyond it simply discarded.
+    const { pool, autoSuccesses } = capPool(basePool, options.maxPool);
+
     // Roll the initial pool
     let dice = rollDice(pool);
     let storyBeats = dice.filter(r => r === 1).length;
-    let successes = countSuccesses(dice);
+    let successes = countSuccesses(dice) + autoSuccesses;
     let reRolls = 0;
     let reRolledDice = [];
     let rerollSuccesses = 0;
@@ -512,7 +561,7 @@ function performRoll(attr, skill, dv, position = 'controlled', boons = 0, option
             const rerolledWasOne = dice[pick] === 1;
             dice = dice.map((r, i) => (i === pick ? rerollResults[0] : r));
             // Recalculate successes from the final dice.
-            successes = countSuccesses(dice);
+            successes = countSuccesses(dice) + autoSuccesses;
             // Story Beats are NOT recomputed from the final dice. SRD 18.1:
             // "Re-rolling a 1 does not erase its SB; if the re-rolled die also
             // shows 1, it generates additional SB." Recomputing wiped the beat
@@ -541,7 +590,7 @@ function performRoll(attr, skill, dv, position = 'controlled', boons = 0, option
             const rerolledWasOne = dice[pick] === 1;
             dice = dice.map((r, i) => (i === pick ? rerollResults[0] : r));
             // Recalculate successes from the final dice.
-            successes = countSuccesses(dice);
+            successes = countSuccesses(dice) + autoSuccesses;
             // Story Beats are NOT recomputed from the final dice. SRD 18.1:
             // "Re-rolling a 1 does not erase its SB; if the re-rolled die also
             // shows 1, it generates additional SB." Recomputing wiped the beat
@@ -593,7 +642,9 @@ function performRoll(attr, skill, dv, position = 'controlled', boons = 0, option
         critical,               // NEW: true only if a 10 was rolled AND successes >= dv
         dv,
         position,
+        requestedPosition,
         boons,
+        autoSuccesses,
         attr,
         skill,
         outcome,
@@ -766,5 +817,10 @@ export default {
     getOutcomeLabelFromCode,
     countSuccesses,
     countTens,
-    isCriticalRoll
+    isCriticalRoll,
+    shiftPosition,
+    capPool,
+    POSITIONS,
+    MAX_POOL,
+    TIER_MAX_POOL
 };

@@ -81,7 +81,7 @@
 
 import { t as i18nText } from '@core/i18n.js';
 import { getCharacterData, saveCharacter } from '@features/spellcraft/index.js';
-import { escHtml, generateId, safeParseInt } from '@core/utils.js';
+import { escHtml, generateId, safeParseInt, maxBoonsForXp } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
 import { getState, saveState } from '@core/state.js';
 import { performRoll } from '@core/dice.js';
@@ -271,13 +271,6 @@ function formatText(text) {
     return escHtml(text).replace(/\n/g, '<br>');
 }
 
-function getTierFromXp(xp) {
-    if (xp < 40) return 'I';
-    if (xp < 90) return 'II';
-    if (xp < 150) return 'III';
-    if (xp < 220) return 'IV';
-    return 'V';
-}
 
 // ─── Magic Paths Reference ─────────────────────────────────────
 const MAGIC_PATH_REFERENCE = [
@@ -803,7 +796,7 @@ window.witchSubmitQuickWork = function() {
     const lore = char.skills?.lore || 0;
     const pool = wits + lore;
     const dv = isDesperate ? 4 : 3;
-    const result = performRoll(pool, dv);
+    const result = performRoll(pool, 0, dv);
 
     let outcome, priceType, sbCount = 0, boons = 0;
     if (result.successes >= dv && result.storyBeats === 0) {
@@ -842,7 +835,7 @@ window.witchSubmitQuickWork = function() {
 
     if (boons > 0) {
         char.boons = (char.boons || 0) + boons;
-        if (char.boons > 5) char.boons = 5;
+        { const cap = maxBoonsForXp(char.totalXp); if (char.boons > cap) char.boons = cap; } // SRD: 5 Boons, 6 at Tier IV, 7 at Tier V
         saveCharacter({ boons: char.boons });
     }
 
@@ -901,7 +894,7 @@ window.witchSubmitRitual = function() {
     const spirit = char.spirit || 1;
     const lore = char.skills?.lore || 0;
     const pool = spirit + lore;
-    const result = performRoll(pool, dv);
+    const result = performRoll(pool, 0, dv);
 
     let outcome, success = false, boons = 0, sbCount = 0;
     if (result.successes >= dv && result.storyBeats === 0) {
@@ -929,7 +922,7 @@ window.witchSubmitRitual = function() {
 
     if (boons > 0) {
         char.boons = (char.boons || 0) + boons;
-        if (char.boons > 5) char.boons = 5;
+        { const cap = maxBoonsForXp(char.totalXp); if (char.boons > cap) char.boons = cap; } // SRD: 5 Boons, 6 at Tier IV, 7 at Tier V
         saveCharacter({ boons: char.boons });
     }
 

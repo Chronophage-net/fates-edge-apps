@@ -7,7 +7,7 @@ const CORE_SKILLS = [
 const RETIRED_SKILLS = {
     unarmed: 'melee', brawl: 'melee', subterfuge: 'deception',
     investigation: 'insight', tactics: 'insight', medicine: 'craft',
-    ritual: 'lore', survival: 'endurance', command: 'sway', resolve: 'endurance'
+    ritual: 'lore', survival: 'insight', command: 'sway', resolve: 'endurance'
 };
 
 export function parsePregens(payload) {

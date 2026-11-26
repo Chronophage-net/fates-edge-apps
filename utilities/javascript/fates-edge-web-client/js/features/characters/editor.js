@@ -33,7 +33,7 @@
 
 import { t as i18nText } from '@core/i18n.js';
 import { getState, addCharacter, getCharacter, updateCharacter, deleteCharacter } from '@core/state.js';
-import { generateId, escHtml, safeParseInt, clamp } from '@core/utils.js';
+import { generateId, escHtml, safeParseInt, clamp, getTierFromXp as coreTierFromXp, TIERS } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
 import { loadPatronData } from '@features/patrons/index.js';
 import { openTalentEditor } from './talent-editor.js';
@@ -57,7 +57,7 @@ export const ALL_SKILLS = [
 export const SKILL_ATTRIBUTES = {
     melee: 'body', ranged: 'wits', athletics: 'body', stealth: 'wits',
     endurance: 'body', craft: 'wits', sway: 'presence', deception: 'presence',
-    performance: 'presence', insight: 'spirit', lore: 'wits', arcana: 'spirit'
+    performance: 'presence', insight: 'wits', lore: 'wits', arcana: 'wits'
 };
 
 export const HERITAGES = [
@@ -106,13 +106,6 @@ const SHIELD_TYPES = [
     { id: 'pavise', label: 'Pavise (12 XP)', xpCost: 12 }
 ];
 
-const TIER_THRESHOLDS = [
-    { min: 0, max: 40, tier: 'I', name: 'Novice' },
-    { min: 41, max: 90, tier: 'II', name: 'Seasoned' },
-    { min: 91, max: 150, tier: 'III', name: 'Veteran' },
-    { min: 151, max: 220, tier: 'IV', name: 'Paragon' },
-    { min: 221, max: Infinity, tier: 'V', name: 'Mythic' }
-];
 
 const TALENT_TIERS = [
     { id: 'minor', label: 'Minor', xpRange: '2–3 XP', min: 2, max: 3 },
@@ -365,13 +358,9 @@ function calculateTotalXpSpent(c) {
     return spent;
 }
 
+// SRD tiers live in core/utils.js (TIERS); kept as an export for character-pdf.js.
 export function getTierFromXp(xp) {
-    for (const t of TIER_THRESHOLDS) {
-        if (xp >= t.min && xp <= t.max) {
-            return { tier: t.tier, name: t.name };
-        }
-    }
-    return { tier: 'V', name: 'Mythic' };
+    return coreTierFromXp(xp);
 }
 
 // ============================================================

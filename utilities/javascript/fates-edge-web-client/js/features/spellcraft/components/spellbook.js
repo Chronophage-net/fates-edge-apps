@@ -99,9 +99,10 @@
 
 import { t as i18nText, tn as i18nPlural } from '@core/i18n.js';
 import { getCharacterData, saveCharacter } from '@features/spellcraft/index.js';
-import { escHtml, generateId, safeParseInt } from '@core/utils.js';
+import { escHtml, generateId, safeParseInt, maxBoonsForXp } from '@core/utils.js';
 import { showToast } from '@components/Toast.js';
 import { performRoll } from '@core/dice.js';
+import { spellDV } from '../spell-dv.js';
 import { getState } from '@core/state.js';
 import patronsModule from '@features/patrons/index.js';
 import { sendEvent, sendRoll, isConnectedToServer } from '@core/websocket.js';
@@ -612,7 +613,7 @@ function buildSpellCardHTML(spell, char) {
     const signatureBonus = signature ? 1 : 0;
     const witsPool = wits + arcana + signatureBonus;
     const spiritPool = spirit + arcana + signatureBonus;
-    const recommendedDv = 1 + tags.length;
+    const recommendedDv = spellDV(tags);
 
     // Tag badges
     const tagBadges = tags.map(tag => {
@@ -1179,7 +1180,7 @@ window.spellbookFromTags = async function() {
         showToast(i18nText("feature.spellcraft.components.spellbook.unknownTagsValueTheyWillBeIncluded", { value0: invalidTags.join(', ') }, "Unknown tags: {{value0}}. They will be included but have no color."), 'warning');
     }
 
-    const dv = 1 + validTags.length;
+    const dv = spellDV(validTags);
     const name = prompt(i18nText("feature.spellcraft.components.spellbook.spellName", null, "Spell name:"), validTags.join(' ') || 'New Spell');
     if (!name) return;
     const description = prompt(i18nText("feature.spellcraft.components.spellbook.descriptionEffect", null, "Description / Effect:")) || '';
@@ -1576,7 +1577,7 @@ window.spellbookUse = async function(id, attributeChoice) {
         return;
     }
 
-    const result = performRoll(pool, dv);
+    const result = performRoll(pool, 0, dv);
 
     // Determine outcome
     let outcome, outcomeLabel, backlashSeverity, boonGain;
@@ -1610,7 +1611,7 @@ window.spellbookUse = async function(id, attributeChoice) {
 
     if (boonGain > 0) {
         char.boons = (char.boons || 0) + boonGain;
-        if (char.boons > 5) char.boons = 5;
+        { const cap = maxBoonsForXp(char.totalXp); if (char.boons > cap) char.boons = cap; } // SRD: 5 Boons, 6 at Tier IV, 7 at Tier V
         showToast(i18nPlural('feature.spellcraft.components.spellbook.boonsGained', boonGain, null, '+{{count}} Boons gained.'), 'info');
     }
 

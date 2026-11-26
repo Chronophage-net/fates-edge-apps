@@ -742,7 +742,7 @@ function performPsionicAction(char, artId, dv, strainCost, target) {
     }
 
     // Roll
-    const rollResult = performRoll(pool, dv);
+    const rollResult = performRoll(pool, 0, dv);
     const success = rollResult.successes >= dv;
     const sb = rollResult.storyBeats || 0;
 

@@ -54,10 +54,10 @@ export const COMMON_ROLLS = {
     Acrobatics: { attr: 'body', skill: 'athletics' },
     Persuasion: { attr: 'presence', skill: 'sway' },
     Deception: { attr: 'presence', skill: 'deception' },
-    Insight: { attr: 'spirit', skill: 'insight' },
-    Survival: { attr: 'body', skill: 'endurance' },          // using endurance for survival
+    Insight: { attr: 'wits', skill: 'insight' },
+    Survival: { attr: 'wits', skill: 'insight' },            // SRD: tracking and finding water are Wits + Insight
     Medicine: { attr: 'wits', skill: 'craft' },            // Craft is lay knowledge; a body is a thing you mend
-    Arcana: { attr: 'spirit', skill: 'arcana' },
+    Arcana: { attr: 'wits', skill: 'arcana' },
     Intimidation: { attr: 'presence', skill: 'sway' },       // using sway for intimidation
 };
 

@@ -472,7 +472,7 @@ export function performMeditation(char, targetDV = 3) {
     const body = char.body || 1;
     const athletics = char.skills?.athletics || 0;
     const bodyPool = body + athletics;
-    const bodyResult = performRoll(bodyPool, 2);
+    const bodyResult = performRoll(bodyPool, 0, 2);
     const bodySuccess = bodyResult.successes >= 2;
     results.push({
         step: 'Settle the Body',
@@ -485,7 +485,7 @@ export function performMeditation(char, targetDV = 3) {
     const spirit = char.spirit || 1;
     const insight = char.skills?.insight || 0;
     const breathPool = spirit + insight;
-    const breathResult = performRoll(breathPool, 3);
+    const breathResult = performRoll(breathPool, 0, 3);
     const breathSuccess = breathResult.successes >= 3;
     results.push({
         step: 'Settle the Breath',
@@ -498,7 +498,7 @@ export function performMeditation(char, targetDV = 3) {
     const presence = char.presence || 1;
     const sway = char.skills?.sway || 0;
     const stillPool = spirit + presence + Math.floor((insight + sway) / 2);
-    const stillResult = performRoll(stillPool, targetDV);
+    const stillResult = performRoll(stillPool, 0, targetDV);
     const stillSuccess = stillResult.successes >= targetDV;
     let partial = false;
     if (stillResult.successes > 0 && stillResult.successes < targetDV) partial = true;

@@ -987,7 +987,7 @@ window.cantorSimulatePush = function() {
     const resultsHtml = pools.map(p => {
         const results = [];
         for (let i = 0; i < 5; i++) {
-            const roll = performRoll(p.pool, 4);
+            const roll = performRoll(p.pool, 0, 4);
             results.push({
                 successes: roll.successes,
                 sb: roll.storyBeats || 0,

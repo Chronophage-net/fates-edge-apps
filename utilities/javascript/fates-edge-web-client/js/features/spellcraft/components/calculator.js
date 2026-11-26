@@ -24,6 +24,7 @@ import { showToast } from '@components/Toast.js';
 import { escHtml, generateId } from '@core/utils.js';
 import { getState } from '@core/state.js';
 import { performRoll } from '@core/dice.js';
+import { TAGS, TAG_FAMILIES, canonicalTag } from '../tags.js';
 
 // ============================================================
 // STATE
@@ -91,55 +92,49 @@ async function loadWikiTags() {
     return tagDefinitions;
 }
 
+// Example spell names for tags the calculator has long offered.
+const TAG_EXAMPLES = {
+    BURNING: 'Ember Flick',
+    FREEZING: 'Frost Grasp',
+    STORM: 'Cracking Lightning',
+    STONE: 'Grasping Roots',
+    WAVE: 'Tidal Push',
+    WIND: 'Reed Walk',
+    FORCE: 'Unseen Hand',
+    AREA: 'Eruption',
+    STRIKE: 'Fate\'s Needle',
+    WALL: 'Stone Wall',
+    BIND: 'Grasping Roots',
+    DISPEL: 'Cleansing Light',
+    VEIL: 'Shadow Cloak',
+    SCRY: 'Echoing Trace',
+    MEMORY: 'Forgotten Name',
+    COMMAND: 'Blazing Decree',
+    FEAR: 'Crushing Dark',
+    HEAL: 'Lay on Hands',
+    PURIFY: 'Cleansing Light',
+    STRENGTHEN: 'Boon of Vigor',
+    WAKEN: 'Rousing Call',
+    BEAST: 'Verdant Tongue',
+    LEAP: 'Reed Walk',
+    FOLD: 'Shadow Step',
+    GATE: 'Waymark',
+    GRAVITY: 'Crushing Dark',
+    CREATE: 'Momentary Forge',
+    SUMMON: 'Unquiet Host',
+    TRANSMUTE: 'Shed Skin',
+    ANIMATE: 'Living Weapon',
+    REVEAL: 'Echoing Truth',
+    COUNTER: 'Mage\'s Rebuke',
+    CURSE: 'Thorn\'s Bargain'
+};
+
+// The tag vocabulary is the rules one (SRD 11 elements and effect tags plus the
+// Threadweaver's Weave tags); see ../tags.js. Costs: 1, or 2 if dangerous.
 function buildTagDefinitions() {
     const map = new Map();
-    const raw = {
-        'Burning': { mod: 1, category: 'Elemental', description: 'Ignite, heat, combustion, smoke', example: 'Ember Flick' },
-        'Freezing': { mod: 1, category: 'Elemental', description: 'Ice, slowing, brittle shatter, cold', example: 'Frost Grasp' },
-        'Storm': { mod: 1, category: 'Elemental', description: 'Lightning, shock, arc, thunder', example: 'Cracking Lightning' },
-        'Stone': { mod: 1, category: 'Elemental', description: 'Walls, spikes, tremors, armor', example: 'Grasping Roots' },
-        'Wave': { mod: 1, category: 'Elemental', description: 'Crushing water, currents, pressure', example: 'Tidal Push' },
-        'Wind': { mod: 1, category: 'Elemental', description: 'Levitation, gusts, deflection, push/pull', example: 'Reed Walk' },
-        'Force': { mod: 1, category: 'Force', description: 'Kinetic power, shields, blasts, telekinesis', example: 'Unseen Hand' },
-        'Area': { mod: 1, category: 'Force', description: 'Cone, circle, corridor, zone effect', example: 'Eruption' },
-        'Strike': { mod: 1, category: 'Force', description: 'Single target precision', example: 'Fate\'s Needle' },
-        'Wall': { mod: 1, category: 'Force', description: 'Barrier or blockade', example: 'Stone Wall' },
-        'Bind': { mod: 1, category: 'Force', description: 'Restrain, hold, suspend, entangle', example: 'Grasping Roots' },
-        'Dispel': { mod: 1, category: 'Force', description: 'Suppress magic, unravel ongoing effects', example: 'Cleansing Light' },
-        'Veil': { mod: 1, category: 'Mind/Illusion', description: 'Conceal, blur, illusion, silence', example: 'Shadow Cloak' },
-        'Scry': { mod: 1, category: 'Mind/Illusion', description: 'Reveal hidden, see distance, read traces', example: 'Echoing Trace' },
-        'Memory': { mod: 1, category: 'Mind/Illusion', description: 'Erase, alter, restore memories', example: 'Forgotten Name' },
-        'Command': { mod: 1, category: 'Mind/Illusion', description: 'Compel a short action (one word)', example: 'Blazing Decree' },
-        'Fear': { mod: 1, category: 'Mind/Illusion', description: 'Panic, flee, break morale', example: 'Crushing Dark' },
-        'HEAL': { mod: 1, category: 'Life/Body', description: 'Close wounds, restore flesh, reduce Harm 1', example: 'Lay on Hands' },
-        'Purify': { mod: 1, category: 'Life/Body', description: 'Remove poison, corruption, disease', example: 'Cleansing Light' },
-        'Strengthen': { mod: 1, category: 'Life/Body', description: 'Enhance body, armor, senses (temporary)', example: 'Boon of Vigor' },
-        'Waken': { mod: 1, category: 'Life/Body', description: 'Counter sleep, paralysis, stun', example: 'Rousing Call' },
-        'Beast': { mod: 1, category: 'Life/Body', description: 'Speak with or influence animals', example: 'Verdant Tongue' },
-        'Leap': { mod: 2, category: 'Space/Motion', description: 'Jump far, blink across short space (Near)', example: 'Reed Walk' },
-        'Fold': { mod: 2, category: 'Space/Motion', description: 'Short-range teleport, vanish-reappear (Far)', example: 'Shadow Step' },
-        'Gate': { mod: 2, category: 'Space/Motion', description: 'Long distance passage, open/close path', example: 'Waymark' },
-        'Gravity': { mod: 2, category: 'Space/Motion', description: 'Crush, lift, suspend, walk on walls/ceiling', example: 'Crushing Dark' },
-        'Create': { mod: 2, category: 'Creation', description: 'Manifest mundane matter briefly (1 scene)', example: 'Momentary Forge' },
-        'Summon': { mod: 2, category: 'Creation', description: 'Call a being or construct', example: 'Unquiet Host' },
-        'Transmute': { mod: 2, category: 'Creation', description: 'Turn one thing into another (temporary)', example: 'Shed Skin' },
-        'Animate': { mod: 2, category: 'Creation', description: 'Make objects act with intent (1 scene)', example: 'Living Weapon' },
-        'Sense': { mod: 1, category: 'Utility', description: 'Detect presence of a named tag/element', example: 'Lingering Trace' },
-        'Reveal': { mod: 1, category: 'Utility', description: 'Unveil hidden, glamoured, or invisible things', example: 'Echoing Truth' },
-        'Light': { mod: 1, category: 'Utility', description: 'Create illumination (glow, torch-bright)', example: 'Dawnlight' },
-        'Shadow': { mod: 1, category: 'Utility', description: 'Deepen darkness, hide edges, obscure', example: 'Umbral Veil' },
-        'Silence': { mod: 1, category: 'Utility', description: 'Suppress sound in zone or on target', example: 'Hush' },
-        'Protect': { mod: 1, category: 'Utility', description: 'Reduce/deflect next harm (Armor 1)', example: 'Aegis' },
-        'Counter': { mod: 1, category: 'Reaction', description: 'Interrupt a casting/ritual in its window', example: 'Mage\'s Rebuke' },
-        'Reflect': { mod: 2, category: 'Reaction', description: 'Turn next targeted effect back on its source', example: 'Mirror\'s Edge' },
-        'Store': { mod: 2, category: 'Utility', description: 'Bank 1-2 successes in a vessel (once)', example: 'Reservoir' },
-        'Curse': { mod: 2, category: 'Affliction', description: 'Attach hostile tag/timer to target', example: 'Thorn\'s Bargain' },
-        'Bless': { mod: 1, category: 'Affliction', description: 'Grant favourable tag (luck, favor, ward-key)', example: 'Tide\'s Favor' }
-    };
-    
-    for (const [name, data] of Object.entries(raw)) {
-        const key = name.toUpperCase();
-        map.set(key, { ...data, name: key });
+    for (const t of TAGS) {
+        map.set(t.name, { name: t.name, mod: t.cost, category: t.family, source: t.source, description: t.description, example: TAG_EXAMPLES[t.name] || '' });
     }
     return map;
 }
@@ -148,31 +143,11 @@ function buildTagDefinitions() {
 // CATEGORY METADATA
 // ============================================================
 
-const CATEGORY_COLORS = {
-    'Elemental': '#e67e22',
-    'Force': '#e74c3c',
-    'Mind/Illusion': '#8e44ad',
-    'Life/Body': '#27ae60',
-    'Space/Motion': '#2980b9',
-    'Creation': '#f39c12',
-    'Utility': '#7f8c8d',
-    'Reaction': '#c0392b',
-    'Affliction': '#d35400'
-};
+const CATEGORY_COLORS = Object.fromEntries(Object.entries(TAG_FAMILIES).map(([k, v]) => [k, v.color]));
 
-const CATEGORY_ICONS = {
-    'Elemental': '🔥',
-    'Force': '💥',
-    'Mind/Illusion': '🧠',
-    'Life/Body': '💚',
-    'Space/Motion': '🌀',
-    'Creation': '✨',
-    'Utility': '🔧',
-    'Reaction': '⚡',
-    'Affliction': '💀'
-};
+const CATEGORY_ICONS = Object.fromEntries(Object.entries(TAG_FAMILIES).map(([k, v]) => [k, v.icon]));
 
-const CATEGORY_ORDER = ['Elemental', 'Force', 'Mind/Illusion', 'Life/Body', 'Space/Motion', 'Creation', 'Utility', 'Reaction', 'Affliction'];
+const CATEGORY_ORDER = Object.keys(TAG_FAMILIES);
 
 // ─── Magic Paths Reference ─────────────────────────────────────
 // Shown as a resource when no Free Caster character is selected, so the
@@ -211,68 +186,62 @@ function renderMagicPathReferenceHtml(highlightLabel) {
 
 // ─── Spell Templates ──────────────────────────────────────────
 
+// SRD example spells (appendix: Example Spells) and Weave templates whose tags
+// are all rules tags. DVs follow from the tags: 1 + the sum of tag costs.
 const SPELL_TEMPLATES = [
-    { name: '🔥 Firebolt', tags: ['Burning', 'Strike'], description: 'A bolt of flame strikes a single target.' },
-    { name: '❄️ Frost Grasp', tags: ['Freezing', 'Bind'], description: 'Ice encases a target, holding them in place.' },
-    { name: '🌿 Healing Touch', tags: ['HEAL', 'Strengthen'], description: 'Close wounds and restore vitality to a touched ally.' },
-    { name: '🌀 Telekinetic Push', tags: ['Force', 'Wind', 'Strike'], description: 'A blast of force knocks a target back.' },
-    { name: '🌙 Shadow Veil', tags: ['Veil', 'Shadow', 'Silence'], description: 'Conceal yourself and allies in moving shadow.' },
-    { name: '⚡ Storm Bolt', tags: ['Storm', 'Strike', 'Area'], description: 'A crackling bolt of ' +
-        'lightning arcs through a zone.' },
-    { name: '🛡️ Aegis', tags: ['Protect', 'Strengthen', 'Force'], description: 'A shimmering barrier ' +
-        'protects you from harm.' },
-    { name: '🔮 Scrying Eye', tags: ['Scry', 'Sense', 'Reveal'], description: 'Glimpse a distant place or ' +
-        'hidden truth.' },
-    { name: '💀 Leashed Curse', tags: ['Curse', 'Bind', 'Fear'], description: 'A curse that tightens as the ' +
-        'target struggles.' },
-    { name: '✨ Momentary Forge', tags: ['Create', 'Transmute', 'Animate'], description: 'Shape raw matter ' +
-        'into a temporary tool or weapon.' }
+    { name: '🔥 Spark (Cantrip)', tags: ['FIRE', 'STRIKE'], description: 'Ranged Harm 1 (fire) to one target within Near.' },
+    { name: '💧 Minor Illusion', tags: ['WATER', 'VEIL'], description: 'A simple sound or image within Near for one exchange.' },
+    { name: '💨 Gust', tags: ['AIR', 'PASSAGE'], description: 'Push one object or creature your size or smaller one band back.' },
+    { name: '🛡️ Ember Cloak', tags: ['FIRE', 'DEFEND'], description: '+1 die to Defend rolls against cold or melee attacks for the scene.' },
+    { name: '🕸️ Web of Fate', tags: ['FATE', 'BIND'], description: 'Immobilize one target within Near; break free with Body + Athletics vs DV 4.' },
+    { name: '🌿 Healing Mist', tags: ['WATER', 'HEAL', 'AREA'], description: 'All allies in Close clear 1 Fatigue.' },
+    { name: '🪨 Stone Shield', tags: ['EARTH', 'BARRIER'], description: 'A stone wall with Integrity Timer [4] that blocks movement.' },
+    { name: '🌀 Shadow Step', tags: ['AIR', 'FOLD'], description: 'Teleport self within Near range (dangerous tag).' },
+    { name: '⚡ Fate\'s Rebuke', tags: ['FATE', 'STRIKE', 'STRIKE'], description: 'Ranged Harm 2 (psychic); ignores non-magical armor.' },
+    { name: '😴 Sleep', tags: ['DEATH', 'COMMAND'], description: 'One target within Near falls into a natural sleep.' },
+    { name: '❄️ Frost Grasp', tags: ['FREEZING', 'BIND'], description: 'Ice encases a target, holding them in place.' },
+    { name: '🌩️ Storm Bolt', tags: ['STORM', 'STRIKE', 'AREA'], description: 'A crackling bolt that arcs through a zone.' },
+    { name: '🔮 Scrying Eye', tags: ['SCRY', 'REVEAL'], description: 'Glimpse a distant place and expose what is hidden there.' },
+    { name: '💀 Leashed Curse', tags: ['CURSE', 'BIND', 'FEAR'], description: 'A curse that tightens as the target struggles.' },
+    { name: '✨ Momentary Forge', tags: ['CREATE', 'TRANSMUTE', 'ANIMATE'], description: 'Shape raw matter into a working tool for a scene.' },
 ];
 
 // ─── Tag Combination Hints ────────────────────────────────────
 
 const TAG_HINTS = {
-    'Burning': 'Pair with Wind for a spreading fire, or with Strike for a concentrated bolt.',
-    'Freezing': 'Pair with Bind to trap, or with Area for a chilling fog.',
-    'Storm': 'Pair with Strike for a lightning bolt, or with Area for a thunderclap.',
-    'Stone': 'Pair with Wall for a barrier, or with Bind for a cage.',
-    'Wave': 'Pair with Area for a tidal surge, or with Strike for a water jet.',
-    'Wind': 'Pair with Leap for a jump, or with Force for a gust.',
-    'Force': 'The foundation of telekinesis. Pairs with almost anything.',
-    'Area': 'Makes a spell affect a zone. Costs more DV but affects multiple targets.',
-    'Strike': 'Focused single-target damage. Pairs with elemental tags.',
-    'Wall': 'Creates a barrier. Pairs with Stone, Force, or even Shadow.',
-    'Bind': 'Restrains a target. Pairs with Freezing, Stone, or Fear.',
-    'Dispel': 'Counters magic. Pair with Counter for a reactive dispel.',
-    'Veil': 'Concealment and illusion. Pairs with Shadow or Silence.',
-    'Scry': 'Distant perception. Pairs with Sense or Reveal.',
-    'Memory': 'Mind magic. Handle with care—Backlash is steep.',
-    'Command': 'One-word compulsion. High risk, high reward.',
-    'Fear': 'Area morale break. Pairs with Command or Bind.',
+    'BURNING': 'Pair with Wind for a spreading fire, or with Strike for a concentrated bolt.',
+    'FREEZING': 'Pair with Bind to trap, or with Area for a chilling fog.',
+    'STORM': 'Pair with Strike for a lightning bolt, or with Area for a thunderclap.',
+    'STONE': 'Pair with Wall for a barrier, or with Bind for a cage.',
+    'WAVE': 'Pair with Area for a tidal surge, or with Strike for a water jet.',
+    'WIND': 'Pair with Leap for a jump, or with Force for a gust.',
+    'FORCE': 'The foundation of telekinesis. Pairs with almost anything.',
+    'AREA': 'Makes a spell affect a zone. Costs more DV but affects multiple targets.',
+    'STRIKE': 'Focused single-target damage. Pairs with elemental tags.',
+    'WALL': 'Creates a barrier. Pairs with Stone, Force, or even Shadow.',
+    'BIND': 'Restrains a target. Pairs with Freezing, Stone, or Fear.',
+    'DISPEL': 'Counters magic. Pair with Counter for a reactive dispel.',
+    'VEIL': 'Concealment and illusion. Pairs with Shadow or Silence.',
+    'SCRY': 'Distant perception. Pairs with Sense or Reveal.',
+    'MEMORY': 'Mind magic. Handle with care—Backlash is steep.',
+    'COMMAND': 'One-word compulsion. High risk, high reward.',
+    'FEAR': 'Area morale break. Pairs with Command or Bind.',
     'HEAL': 'Restoration magic. Safe and reliable.',
-    'Purify': 'Cleansing. Essential for dealing with corruption.',
-    'Strengthen': 'Temporary buffs. Pairs with Protect or HEAL.',
-    'Waken': 'Counter to sleep/stun. Situational but clutch.',
-    'Beast': 'Animal communication. Pairs with Sense.',
-    'Leap': 'Short-range teleport. Pairs with Wind or Shadow.',
-    'Fold': 'Long-range teleport. Very high DV. Use sparingly.',
-    'Gate': 'Create a passage. Requires serious DV.',
-    'Gravity': 'Alter gravity. High risk of Backlash.',
-    'Create': 'Manifest matter. Brief but versatile.',
-    'Summon': 'Call a being. Requires other tags to specify.',
-    'Transmute': 'Change form. High Backlash risk.',
-    'Animate': 'Give objects life. Brief and limited.',
-    'Sense': 'Detection magic. Cheap and reliable.',
-    'Reveal': 'Pierce illusions. Pairs with Sense.',
-    'Light': 'Illumination. Simple and safe.',
-    'Shadow': 'Darkness. Pairs with Veil or Silence.',
-    'Silence': 'Sound suppression. Pairs with Veil.',
-    'Protect': 'Defensive. Pairs with Strengthen.',
-    'Counter': 'Reactive. Triggers when someone casts near you.',
-    'Reflect': 'Redirect magic. Very high risk.',
-    'Store': 'Bank successes. Prep time required.',
-    'Curse': 'Hostile affliction. High risk of spreading.',
-    'Bless': 'Friendly affliction. Reliable and appreciated.'
+    'PURIFY': 'Cleansing. Essential for dealing with corruption.',
+    'STRENGTHEN': 'Temporary buffs. Pairs with Protect or HEAL.',
+    'WAKEN': 'Counter to sleep/stun. Situational but clutch.',
+    'BEAST': 'Animal communication. Pairs with Sense.',
+    'LEAP': 'Short-range teleport. Pairs with Wind or Shadow.',
+    'FOLD': 'Long-range teleport. Very high DV. Use sparingly.',
+    'GATE': 'Create a passage. Requires serious DV.',
+    'GRAVITY': 'Alter gravity. High risk of Backlash.',
+    'CREATE': 'Manifest matter. Brief but versatile.',
+    'SUMMON': 'Call a being. Requires other tags to specify.',
+    'TRANSMUTE': 'Change form. High Backlash risk.',
+    'ANIMATE': 'Give objects life. Brief and limited.',
+    'REVEAL': 'Pierce illusions. Pairs with Sense.',
+    'COUNTER': 'Reactive. Triggers when someone casts near you.',
+    'CURSE': 'Hostile affliction. High risk of spreading.',
 };
 
 // ============================================================
@@ -280,7 +249,7 @@ const TAG_HINTS = {
 // ============================================================
 
 function calculatorAddTag(tag) {
-    const upper = tag.toUpperCase();
+    const upper = canonicalTag(tag);
     if (!tagDefinitions || !tagDefinitions.has(upper)) {
         showToast(i18nText("feature.spellcraft.components.calculator.unknownTagValueCheckTheLexicon", { value0: tag }, "Unknown tag: \"{{value0}}\" — check the lexicon."), 'warning');
         return;
@@ -318,7 +287,7 @@ function calculatorRefresh() {
 function calculatorShowHint(tag) {
     const hintEl = document.getElementById('tag-hint');
     if (!hintEl) return;
-    const upper = tag.toUpperCase();
+    const upper = canonicalTag(tag);
     const def = tagDefinitions ? tagDefinitions.get(upper) : null;
     const hint = TAG_HINTS[upper] || def?.description || '';
     if (hint) {
@@ -456,7 +425,7 @@ function calculatorTestCast() {
     }
 
     // Roll using core dice module
-    const result = performRoll(pool, dv);
+    const result = performRoll(pool, 0, dv);
 
     // Determine outcome
     let outcomeLabel, backlashSeverity, backlashDesc, outcomeColor;
@@ -549,7 +518,7 @@ function calculatorGamble() {
     // Simulate 3 rolls
     const outcomes = [];
     for (let i = 0; i < 3; i++) {
-        const result = performRoll(pool, dv);
+        const result = performRoll(pool, 0, dv);
         let outcome = '';
         if (result.successes >= dv && result.storyBeats === 0) outcome = '✨ Clean';
         else if (result.successes >= dv && result.storyBeats > 0) outcome = '⚠️ Success';
@@ -909,7 +878,7 @@ function attachEvents(el) {
     // Template buttons
     el.querySelectorAll('.template-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            const tags = (btn.dataset.tags || '').split(',').map(t => t.trim().toUpperCase()).filter(Boolean);
+            const tags = (btn.dataset.tags || '').split(',').map(t => canonicalTag(t)).filter(Boolean);
             window.calculatorClear();
             for (const tag of tags) {
                 if (tag && tagDefinitions && tagDefinitions.has(tag)) {
@@ -963,12 +932,16 @@ function generateSpellDescription(tags) {
 }
 
 function calculateDV(tags) {
-    let dv = 1 + tags.length;
+    // SRD: DV = 1 + the sum of tag costs (1 ordinary, 2 dangerous). This used
+    // to start from 1 + the tag count and then add each tag's cost again, so
+    // every tag was counted twice (Teleport [AIR][FOLD] came out 6, not 4).
+    let dv = 1;
     let totalMod = 0;
     let breakdown = [];
     let unknownTags = [];
 
-    for (const tag of tags) {
+    for (const rawTag of tags) {
+        const tag = canonicalTag(rawTag);
         if (tagDefinitions && tagDefinitions.has(tag)) {
             const def = tagDefinitions.get(tag);
             const mod = def.mod || 1;
@@ -977,6 +950,7 @@ function calculateDV(tags) {
             breakdown.push(`${tag}${danger} (+${mod})`);
         } else {
             unknownTags.push(tag);
+            totalMod += 1; // an unknown tag still costs its +1
             breakdown.push(`${tag} (?)`);
         }
     }

@@ -36,7 +36,7 @@
  */
 
 import { t as i18nText } from '@core/i18n.js';
-import { generateId, escHtml, safeParseInt, clamp } from '@core/utils.js';
+import { generateId, escHtml, safeParseInt, clamp, getTierFromXp } from '@core/utils.js';
 import { getState, addCharacter } from '@core/state.js';
 import { showToast } from '@components/Toast.js';
 import { loadPatronData } from '@features/patrons/index.js';
@@ -53,7 +53,7 @@ const ALL_SKILLS = [
 const SKILL_ATTRIBUTES = {
     melee: 'body', ranged: 'wits', athletics: 'body', stealth: 'wits',
     endurance: 'body', craft: 'wits', sway: 'presence', deception: 'presence',
-    performance: 'presence', insight: 'spirit', lore: 'wits', arcana: 'spirit'
+    performance: 'presence', insight: 'wits', lore: 'wits', arcana: 'wits'
 };
 
 const HERITAGES = [
@@ -99,13 +99,6 @@ const REGIONS = [
     'Sekogo', 'Taharka', 'Sidhi', 'Ngomebe', 'Dhahara', 'Oshiira'
 ];
 
-const TIER_THRESHOLDS = [
-    { min: 0, max: 40, tier: 'I', name: 'Novice' },
-    { min: 41, max: 90, tier: 'II', name: 'Seasoned' },
-    { min: 91, max: 150, tier: 'III', name: 'Veteran' },
-    { min: 151, max: 220, tier: 'IV', name: 'Paragon' },
-    { min: 221, max: Infinity, tier: 'V', name: 'Mythic' }
-];
 
 const TALENT_TIERS = [
     { id: 'minor', label: 'Minor', xpRange: '2–3 XP', min: 2, max: 3 },
@@ -147,12 +140,6 @@ function defaultSkills() {
     return skills;
 }
 
-function getTierFromXp(xp) {
-    for (const t of TIER_THRESHOLDS) {
-        if (xp >= t.min && xp <= t.max) return t;
-    }
-    return TIER_THRESHOLDS[TIER_THRESHOLDS.length - 1];
-}
 
 // ─── Thiasos/Codex → Patron mapping ──────────────────────────────
 
@@ -522,7 +509,7 @@ export async function openWizard() {
             magicPath: 'none',
             magicPathNote: MAGIC_PATHS.find(p => p.id === 'none')?.note || '',
             tier: 'I',
-            tierName: 'Novice',
+            tierName: 'Rookie',
             totalXp: 32,
             startingXp: 32,
             body: 1,
@@ -1100,8 +1087,8 @@ function renderStep0Identity(d) {
 function renderStep1Attributes(d) {
     const attrs = [
         { id: 'body', name: 'Body', desc: 'Strength, endurance, physical resilience', skills: 'Melee, Athletics, Endurance' },
-        { id: 'wits', name: 'Wits', desc: 'Perception, speed, quick thinking', skills: 'Ranged, Stealth, Craft, Lore' },
-        { id: 'spirit', name: 'Spirit', desc: 'Willpower, focus, magical aptitude', skills: 'Insight, Arcana' },
+        { id: 'wits', name: 'Wits', desc: 'Perception, speed, quick thinking', skills: 'Ranged, Stealth, Craft, Insight, Lore, Arcana' },
+        { id: 'spirit', name: 'Spirit', desc: 'Willpower, focus, magical aptitude', skills: 'Rites (Lore), composure (Endurance), magic' },
         { id: 'presence', name: 'Presence', desc: 'Charisma, social influence, force of personality', skills: 'Sway, Deception, Performance' }
     ];
     

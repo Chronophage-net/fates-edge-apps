@@ -744,7 +744,7 @@ export function render(el) {
               </div>
               <div class="vtt-field" style="flex:0 0 70px;">
                 <label data-i18n="feature.vtt.vtt-local.boons">Boons</label>
-                <input type="number" id="vtt-boons" value="0" min="0" max="5" />
+                <input type="number" id="vtt-boons" value="0" min="0" max="7" />
               </div>
             </div>
             <div class="vtt-dice-row" style="margin-top:0.4rem;">

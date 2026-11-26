@@ -45,7 +45,7 @@
 import { t as i18nText } from '@core/i18n.js';
 import { getState, saveState, getCharacter, updateCharacter } from '@core/state.js';
 import { showToast } from '@components/Toast.js';
-import { escHtml, safeParseInt } from '@core/utils.js';
+import { escHtml, safeParseInt, getTierFromXp } from '@core/utils.js';
 import patrons from '@features/patrons/index.js';
 
 const { 
@@ -244,21 +244,13 @@ function parseRiteBaseObligationCost(rite) {
 }
 
 // ─── Character Tier (for High Rite gating) ─────────────────
-const TIER_THRESHOLDS = [
-    { min: 0,   max: 40,       tier: 'I',   name: 'Novice' },
-    { min: 41,  max: 90,       tier: 'II',  name: 'Seasoned' },
-    { min: 91,  max: 150,      tier: 'III', name: 'Veteran' },
-    { min: 151, max: 220,      tier: 'IV',  name: 'Paragon' },
-    { min: 221, max: Infinity, tier: 'V',   name: 'Mythic' }
-];
 
 const TIER_RANK = { 'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5 };
 
 function getCharacterTier(char) {
     if (char && char.tier && TIER_RANK[char.tier]) return char.tier;
     const totalXp = (char && char.totalXp) || 0;
-    const found = TIER_THRESHOLDS.find(t => totalXp >= t.min && totalXp <= t.max);
-    return found ? found.tier : 'I';
+    return getTierFromXp(totalXp).tier;
 }
 
 function meetsTierRequirement(char, requiredTier) {

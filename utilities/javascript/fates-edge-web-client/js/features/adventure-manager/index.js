@@ -2050,7 +2050,7 @@ function renderCreateAdventure() {
                     <div>
                         <label style="font-size:0.75rem;font-weight:600;" data-i18n="feature.adventure-manager.tier">Tier</label>
                         <select id="adv-create-tier" style="width:100%;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.3rem;">
-                            <option value="I" data-i18n="feature.adventure-manager.iNovice">I — Novice</option>
+                            <option value="I" data-i18n="feature.adventure-manager.iNovice">I — Rookie</option>
                             <option value="II" data-i18n="feature.adventure-manager.iiSeasoned">II — Seasoned</option>
                             <option value="III" selected data-i18n="feature.adventure-manager.iiiVeteran">III — Veteran</option>
                             <option value="IV" data-i18n="feature.adventure-manager.ivParagon">IV — Paragon</option>

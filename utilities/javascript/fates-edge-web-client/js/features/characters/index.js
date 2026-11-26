@@ -38,7 +38,7 @@
  */
 
 import { t as i18nText, tn as i18nPlural } from '@core/i18n.js';
-import { generateId, escHtml, safeParseInt, clamp } from '@core/utils.js';
+import { generateId, escHtml, safeParseInt, clamp, getTierFromXp } from '@core/utils.js';
 import { getCharacter, 
 	addCharacter, 
 	updateCharacter,
@@ -81,13 +81,6 @@ const PARTY_ROLES = [
     { id: 'utility', label: 'Utility', attr: 'Wits or Spirit', icon: '🔍', desc: 'Gather information, solve puzzles, negotiate with spirits' }
 ];
 
-const TIER_INFO = [
-    { min: 0, max: 40, tier: 'I', name: 'Novice', color: '#8bc34a' },
-    { min: 41, max: 90, tier: 'II', name: 'Seasoned', color: '#4caf50' },
-    { min: 91, max: 150, tier: 'III', name: 'Veteran', color: '#ff9800' },
-    { min: 151, max: 220, tier: 'IV', name: 'Paragon', color: '#e91e63' },
-    { min: 221, max: Infinity, tier: 'V', name: 'Mythic', color: '#9c27b0' }
-];
 
 // Each path now carries a short `blurb` in addition to label/icon, so this
 // single object can double as the data source for the "no character
@@ -1334,12 +1327,6 @@ export async function attachEvents() {
 // HELPERS (unchanged from original)
 // ============================================================
 
-function getTierFromXp(xp) {
-    for (const t of TIER_INFO) {
-        if (xp >= t.min && xp <= t.max) return t;
-    }
-    return TIER_INFO[TIER_INFO.length - 1];
-}
 
 function getTalentTier(cost) {
     const xp = safeParseInt(cost, 0);

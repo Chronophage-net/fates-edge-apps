@@ -1,3 +1,4 @@
+import { maxBoonsForXp } from '@core/utils.js';
 import { getCraftState, getCraftedItems, getAttunedItems, availableXp, FLAWS, addToCraftingLog, canForage, recordForageAttempt, upkeepCostFor, intensiveUpkeepCostFor, itemRequiresUpkeep } from './state.js';
 
 export const TIERS = { minor: 2, major: 4, prestige: 6, epic: 8 };
@@ -39,7 +40,7 @@ export function resolveProjectRoll(char, project, result, approach = {}) {
     if (!Number.isInteger(result.successes) || result.successes < 0 || !Number.isInteger(result.storyBeats) || result.storyBeats < 0) throw new Error('Enter non-negative whole-number results.');
     const outcome = result.successes >= project.dv ? 'success' : result.successes > 0 ? 'partial' : 'miss';
     const boons = outcome === 'partial' ? 1 : outcome === 'miss' ? 2 : 0;
-    char.boons = Math.min(5, (char.boons || 0) + boons);
+    char.boons = Math.min(maxBoonsForXp(char.totalXp), (char.boons || 0) + boons);
     project.lastRoll = { ...result, ...approach, outcome, boons, timestamp: Date.now() };
     if (outcome === 'success') finishProgress(project, 2);
     if (outcome === 'partial') project.pendingPartial = true;
@@ -88,7 +89,7 @@ export function resolveGathering(char, project, result, dv) {
     recordForageAttempt(char);
     project.gathered = result.successes >= dv;
     const outcome = project.gathered ? 'success' : result.successes > 0 ? 'partial' : 'miss';
-    char.boons = Math.min(5, (char.boons || 0) + (outcome === 'partial' ? 1 : outcome === 'miss' ? 2 : 0));
+    char.boons = Math.min(maxBoonsForXp(char.totalXp), (char.boons || 0) + (outcome === 'partial' ? 1 : outcome === 'miss' ? 2 : 0));
     project.lastGathering = { ...result, outcome };
     addToCraftingLog(char, { name: `Gather for ${project.name}: ${outcome}; ${result.storyBeats} SB to bank`, quality: outcome, icon: '🌿' });
     return project.gathered;

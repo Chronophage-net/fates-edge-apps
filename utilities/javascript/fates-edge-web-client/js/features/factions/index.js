@@ -147,7 +147,7 @@ const DEFAULT_FACTIONS = [
         standing: 0,
         agenda: 'Control Silkstrand\'s underworld',
         agendaTimer: { segments: 6, current: 0 },
-        keyNPCs: ['Madam Serafine', 'Old Kes', 'Sister Agatha'],
+        keyNPCs: ['Madam Serafine', 'Celise', 'Sister Agatha'],
         resources: 'Information network, forgery, laundering',
         hooks: ['A rival faction is moving into the Dye District'],
         color: '#8b6bb5',

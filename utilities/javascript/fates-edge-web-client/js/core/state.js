@@ -49,7 +49,7 @@ export const RETIRED_SKILLS = {
   tactics: 'insight',
   medicine: 'craft',
   ritual: 'lore',
-  survival: 'endurance',
+  survival: 'insight',
   command: 'sway',
   resolve: 'endurance',
 };
