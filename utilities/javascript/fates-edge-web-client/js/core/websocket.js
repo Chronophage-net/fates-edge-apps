@@ -1527,6 +1527,23 @@ export function sendEvent(eventData) {
 }
 
 /**
+ * Ask the room server for its adventure (the public, player-safe view).
+ * The answer arrives as an 'adventure-state' event on both transports:
+ * plain WebSocket replies with a typed message; Socket.IO answers the
+ * request's callback, which is re-emitted here under the same name.
+ */
+export function requestAdventureState() {
+    if (connectionMode === 'socketio') {
+        if (!isConnected || !socket || !socket.connected || !roomCode) return false;
+        socket.emit('adventure-state', (data) => {
+            if (data && !data.error) triggerEvent('adventure-state', data);
+        });
+        return true;
+    }
+    return sendWSMessage({ type: 'adventure-state-request' });
+}
+
+/**
  * Send media broadcast (shared)
  */
 export function sendMediaBroadcast(data) {
@@ -1976,6 +1993,7 @@ export default {
     sendChatMessage,
     sendRoll,
     sendEvent,
+    requestAdventureState,
     getConnectedClients,
     getApiBaseUrl,
     sendMediaBroadcast,

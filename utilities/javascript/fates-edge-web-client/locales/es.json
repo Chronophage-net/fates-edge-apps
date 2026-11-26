@@ -321,6 +321,7 @@
     "adventure-manager.onlyTheGMCanResetAnAdventure": "Solo el DJ puede reiniciar una aventura.",
     "adventure-manager.onlyTheGMCanSaveNotes": "Solo el DJ puede guardar notas.",
     "adventure-manager.onlyTheGMCanStartAnAdventure": "Solo el DJ puede comenzar una aventura.",
+    "adventure-manager.roomAdventureRunning": "La sala ya tiene una aventura en curso. Debe terminar antes de empezar una local.",
     "adventure-manager.onlyTheGMCanStartSceneEncounters": "Solo el DJ puede iniciar encuentros de escena.",
     "adventure-manager.onlyTheGMCanTickTimers": "Solo el DJ puede marcar temporizadores.",
     "adventure-manager.onlyTheGMCanUpdateAdventures": "Solo el DJ puede actualizar las aventuras.",

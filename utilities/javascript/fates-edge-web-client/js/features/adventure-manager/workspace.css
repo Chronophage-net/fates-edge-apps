@@ -66,3 +66,11 @@
     .adventure-create .adv-form-grid { grid-template-columns:minmax(0,1fr) !important; }
     .adventure-create .adv-act-row>div { flex-wrap:wrap; }
 }
+
+/* Room adventure (server-held, run by the AI GM or a GM) */
+.adv-live-banner { border:1px solid var(--gold); border-radius:12px; padding:0.75rem 1rem; background:var(--bg2); margin-block-end:1rem; line-height:1.5; }
+.adv-live-clock { display:grid; grid-template-columns:1fr auto auto; align-items:center; gap:0.4rem; margin-block-end:0.75rem; }
+.adv-live-clock > div { grid-column:1 / -1; display:flex; justify-content:space-between; gap:0.5rem; }
+.adv-live-clock progress { inline-size:100%; }
+.adv-live .adv-outline ol { padding-inline-start:1.25rem; }
+.adv-live-here { font-weight:600; color:var(--gold); }

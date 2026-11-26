@@ -68,6 +68,7 @@ import { showToast } from '@components/Toast.js';
 import { escHtml, safeParseInt } from '@core/utils.js';
 import { logToSession, addVTTEvent } from '@features/gm-tools/index.js';
 import { isConnectedToServer, sendEvent, onWSEvent } from '@core/websocket.js';
+import { wireLiveAdventure, onLiveAdventureChange, refreshLiveAdventure, isLiveAdventure, renderLiveAdventure, attachLiveAdventureEvents } from './live-adventure.js';
 import { loadBestiaryData, getCreatureDescription } from '@features/encounters/bestiary.js';
 import { OBJECTIVE_TYPES, DEFAULT_OBJECTIVE_TYPE, getObjectiveType } from '@core/objective-types.js';
 // ─── Role check ──────────────────────────────────────────────
@@ -117,7 +118,8 @@ function logAdventureEvent(message, logType = 'info', vttEventType = 'adventure_
 }
 
 function broadcastSceneStatus(adventure) {
-    if (!isConnectedToServer()) return;
+    // While the room server runs an adventure, its scene is the table's.
+    if (!isConnectedToServer() || isLiveAdventure()) return;
     if (!adventure) {
         try { sendEvent({ type: 'scene-status-update', scene: null }); } catch (e) { /* ignore */ }
         return;
@@ -139,7 +141,7 @@ function broadcastSceneStatus(adventure) {
 }
 
 function broadcastTimerTick(timerName, scope, ref, amount) {
-    if (!isConnectedToServer()) return;
+    if (!isConnectedToServer() || isLiveAdventure()) return;
     try {
         sendEvent({ type: 'adventure-timer', scope, ref, name: timerName, amount });
     } catch (e) { /* ignore */ }
@@ -251,6 +253,8 @@ window.adhocTimerRemove = function(name) {
 // This closes the loop: every client (sender included) reconciles its
 // local timer state to the server's answer.
 function applyRemoteTimerTick(payload) {
+    // A room adventure's ticks belong to the live view, not a local copy.
+    if (isLiveAdventure()) return;
     const ticked = payload && payload.tickedTimer;
     if (!ticked || !ticked.name) return;
 
@@ -948,6 +952,10 @@ function duplicateAdventure(id) {
 // ============================================================
 
 function startAdventure(id) {
+    if (isLiveAdventure()) {
+        showToast(i18nText("feature.adventure-manager.roomAdventureRunning", null, "The room is already running an adventure. It must end before a local one can start."), 'warning');
+        return null;
+    }
     if (!isGM()) {
         showToast(i18nText("feature.adventure-manager.onlyTheGMCanStartAnAdventure", null, "Only the GM can start an adventure."), 'error');
         return null;
@@ -1697,11 +1705,16 @@ function createAdventureFromCrownSpreadReading({ synthesis, cardNames, region, t
 // RENDER (with role‑based gating)
 // ============================================================
 
+let liveUnsubscribe = null;
+
 function render(el) {
     container = el;
     isDestroyed = false;
     loadAdventuresFromState();
     requestAdhocTimers();
+    wireLiveAdventure();
+    if (!liveUnsubscribe) liveUnsubscribe = onLiveAdventureChange(() => renderView());
+    refreshLiveAdventure();
     renderView();
 }
 
@@ -1709,6 +1722,14 @@ function renderView() {
     if (!container || isDestroyed) return;
     const oldNotes = container.querySelector('#adv-notes');
     if (oldNotes?.dataset.adventureId) noteDrafts.set(oldNotes.dataset.adventureId, oldNotes.value);
+
+    // The room server's adventure (run by the AI GM or loaded by a GM)
+    // overrides the local library while it exists.
+    if (isLiveAdventure()) {
+        container.innerHTML = renderLiveAdventure({ canRun: isGM(), renderDescription: renderDescriptionHtml });
+        attachLiveAdventureEvents(container);
+        return;
+    }
 
     if (adventureViewMode === 'detail' && activeAdventureId) {
         container.innerHTML = renderAdventureDetail(activeAdventureId);
@@ -2668,10 +2689,13 @@ function onDeactivate() {
 function refresh() {
     loadAdventuresFromState();
     requestAdhocTimers();
+    refreshLiveAdventure();
     renderView();
 }
 
 function destroy() {
+    liveUnsubscribe?.();
+    liveUnsubscribe = null;
     const notes = container?.querySelector('#adv-notes');
     if (notes?.dataset.adventureId) noteDrafts.set(notes.dataset.adventureId, notes.value);
     isDestroyed = true;

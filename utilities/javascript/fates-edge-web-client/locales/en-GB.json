@@ -321,6 +321,7 @@
     "adventure-manager.onlyTheGMCanResetAnAdventure": "Only the GM can reset an adventure.",
     "adventure-manager.onlyTheGMCanSaveNotes": "Only the GM can save notes.",
     "adventure-manager.onlyTheGMCanStartAnAdventure": "Only the GM can start an adventure.",
+    "adventure-manager.roomAdventureRunning": "The room is already running an adventure. It must end before a local one can start.",
     "adventure-manager.onlyTheGMCanStartSceneEncounters": "Only the GM can start scene encounters.",
     "adventure-manager.onlyTheGMCanTickTimers": "Only the GM can tick timers.",
     "adventure-manager.onlyTheGMCanUpdateAdventures": "Only the GM can update adventures.",
