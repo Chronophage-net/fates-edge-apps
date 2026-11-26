@@ -8,7 +8,7 @@ The real-time backend for the Fate's Edge web toolkit: a WebSocket/Socket.IO ser
 
 ## AI-GM companion compatibility (5.14.1)
 
-Use this server with AI-GM bot **4.18.3**. Upgrade/rebuild and restart the server first, then the bot and web client. Existing ID-less clients remain compatible. Bot deck and Crown Spread requests now include a `requestId` (string, at most 128 characters), echoed on both WebSocket and Socket.IO results. Older servers do not echo it, so new bots time out instead of using another player's draw.
+Use this server with AI-GM bot **4.19.0**. Upgrade/rebuild and restart the server first, then the bot and web client. Existing ID-less clients remain compatible. Bot deck and Crown Spread requests now include a `requestId` (string, at most 128 characters), echoed on both WebSocket and Socket.IO results. Older servers do not echo it, so new bots time out instead of using another player's draw.
 
 Failed assistant suggestions appear as failures in the updated VTT. Check the table state before retrying: a timeout or failure does not roll back earlier writes. Back up persisted campaign data before upgrading; keep existing Docker volumes when recreating containers.
 

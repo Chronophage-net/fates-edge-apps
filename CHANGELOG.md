@@ -1,8 +1,68 @@
-## Dependency security update — 2026-10-24
+## [5.16.0] - 2026-11-26
 
+Installation, consoles, live room status and socket-message fixes, on
+top of the SRD rules alignment and a large content sync.
+
+### Upgrade notes
+- **Socket server Docker image now defaults to port 10000** (was 3000),
+  matching the server's own default, Compose and the AI GM. Deployments
+  that set `PORT` (Compose, Render) are unaffected; a bare
+  `docker run -p 3000:3000` must map 10000 or set `PORT=3000`.
+- **`env-example.md` is removed.** `.env.example` is the complete list of
+  settings. Remove `HEALTH_ENDPOINT=/healthz`, `WS_PORT`,
+  `ALLOWED_API_KEYS` and `DEBUG` from existing `.env` files if copied
+  from the old file (`npm run doctor` flags them).
+- Node.js 22.12 or newer everywhere (the socket server previously said 18).
+- Upgrade the server before the AI GM bot (4.19.0); managed nodes before
+  the manager's dashboard can show live rooms.
+
+### Added
+- `npm run setup`, `npm start` and `npm run doctor`: one-step local
+  install with generated secrets shared by the server and AI GM, one
+  command to run everything, and a read-only checker that says how to fix
+  each problem.
+- Socket server web console at `/console`: rooms, people (role change,
+  kick), adventure (Next scene), characters, timers and the live server
+  log.
+- Manager: live room status reported by node heartbeats ("Live now ·
+  3 people", "Not open right now", "game server offline"), node live
+  counts and heartbeat age, request logging and error logging with
+  request ids.
+- Web client: the room's server-held adventure (run by the AI GM)
+  replaces the local Adventure Manager view while it exists.
+- `fates-edge-cli` 1.7.0: standard library only, `status`, `watch`,
+  `rooms adventure|characters`, role changes, history and Tab
+  completion; a room that is not open is reported, not an error.
+- Document library subcategories; novels grouped by series.
+
+### Fixed
+- Dice rolls were refused in managed rooms and never reached other
+  players over Socket.IO; X-card and whiteboard pings had no server
+  handler; Socket.IO users saw their own chat lines twice; typed events
+  missed their handlers on Socket.IO.
+- `GET /api/rooms` returned 500 on every call.
+- Player tiers and spell tags follow the SRD (Tier I–V, Boon caps, pool
+  caps, Position steps, tag costs and aliases).
+- Desktop builds (electron-builder schema); a circular import that
+  crashed the web client test runner.
+- `adventure-reference` (unrevealed GM knowledge) is GM-only in every room.
+
+### Changed
+- Server, AI GM and manager consoles print one line per event
+  (`time LEVEL message key=value`), with `LOG_FORMAT=json` for log
+  collectors, and a startup report that flags unsafe settings.
+- The web client's `npm run serve` defaults to port 8080.
+
+### Security
 - Patch body-parser, fast-uri, and undici within their existing major versions across the web client, socket server, manager, Discord bot, and desktop client. Update Electron to 44.9.3, with a minimum of 44.9.1.
 - Add live-server regression coverage for unauthenticated crashes caused by compressed request bodies with trailing bytes; verify the tests fail on the vulnerable parser and pass after the update.
 - All seven npm audits report zero known vulnerabilities. All 753 tests in the affected projects and the production web build pass; the checksum-verified Electron runtime passes a basic macOS arm64 renderer smoke test. See SECURITY.md for scope and deployment requirements.
+
+### Content
+- 260 content syncs from fates-edge-docs: reader guides, novels and
+  reading copies, the SRD, regional data and the Gilded Heist, Harbor of
+  Knives, House of Borrowed Voices and What the Water Kept drafts, plus
+  editorial and quality sweeps.
 
 ## [5.14.2] - 2026-10-12
 
