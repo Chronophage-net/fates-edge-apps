@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-11-27T02:34:50.627Z",
+  "generated": "2026-11-27T15:42:55.671Z",
   "documents": [
     {
       "id": "srd",
@@ -467,6 +467,20 @@
       "categoryLabel": "Adventures",
       "core": false,
       "active": true
+    },
+    {
+      "id": "beyond_millhaven",
+      "title": "Beyond Millhaven",
+      "file": "Fates_-_Edge_-_-Beyond-_-Millhaven.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true,
+      "subcategory": "silkstrand",
+      "subcategoryLabel": "Silkstrand & the Velvet Court",
+      "subcategoryOrder": 3,
+      "order": 2
     },
     {
       "id": "black_banners",
@@ -1350,7 +1364,7 @@
       "subcategory": "silkstrand",
       "subcategoryLabel": "Silkstrand & the Velvet Court",
       "subcategoryOrder": 3,
-      "order": 5
+      "order": 6
     },
     {
       "id": "fr_srd_de_fate_s_edge_commencer_ici_la_m_canique_centrale_fran_ais",
@@ -1895,7 +1909,7 @@
       "subcategory": "silkstrand",
       "subcategoryLabel": "Silkstrand & the Velvet Court",
       "subcategoryOrder": 3,
-      "order": 4
+      "order": 5
     },
     {
       "id": "the_harvest_of_leaves",
@@ -1953,7 +1967,7 @@
       "subcategory": "silkstrand",
       "subcategoryLabel": "Silkstrand & the Velvet Court",
       "subcategoryOrder": 3,
-      "order": 3
+      "order": 4
     },
     {
       "id": "the_howling_ice",
@@ -2005,7 +2019,7 @@
       "subcategory": "silkstrand",
       "subcategoryLabel": "Silkstrand & the Velvet Court",
       "subcategoryOrder": 3,
-      "order": 2
+      "order": 3
     },
     {
       "id": "the_last_blade",
@@ -2504,7 +2518,7 @@
       "active": true
     }
   ],
-  "total_count": 171,
-  "active_count": 171,
+  "total_count": 172,
+  "active_count": 172,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
