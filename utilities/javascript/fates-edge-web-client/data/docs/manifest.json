@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2026-11-27T15:42:55.671Z",
+  "generated": "2026-11-27T23:18:37.498Z",
   "documents": [
     {
       "id": "srd",
@@ -1364,7 +1364,7 @@
       "subcategory": "silkstrand",
       "subcategoryLabel": "Silkstrand & the Velvet Court",
       "subcategoryOrder": 3,
-      "order": 6
+      "order": 7
     },
     {
       "id": "fr_srd_de_fate_s_edge_commencer_ici_la_m_canique_centrale_fran_ais",
@@ -1559,6 +1559,20 @@
       "categoryLabel": "Expansions",
       "core": false,
       "active": true
+    },
+    {
+      "id": "the_brass_gate",
+      "title": "The Brass Gate",
+      "file": "Fates_-_Edge_-_-The-_-Brass-_-Gate.html",
+      "path": "/data/docs/novels/",
+      "category": "novels",
+      "categoryLabel": "Novels & Novellas",
+      "core": false,
+      "active": true,
+      "subcategory": "silkstrand",
+      "subcategoryLabel": "Silkstrand & the Velvet Court",
+      "subcategoryOrder": 3,
+      "order": 3
     },
     {
       "id": "the_bridge_born",
@@ -1909,7 +1923,7 @@
       "subcategory": "silkstrand",
       "subcategoryLabel": "Silkstrand & the Velvet Court",
       "subcategoryOrder": 3,
-      "order": 5
+      "order": 6
     },
     {
       "id": "the_harvest_of_leaves",
@@ -1967,7 +1981,7 @@
       "subcategory": "silkstrand",
       "subcategoryLabel": "Silkstrand & the Velvet Court",
       "subcategoryOrder": 3,
-      "order": 4
+      "order": 5
     },
     {
       "id": "the_howling_ice",
@@ -2019,7 +2033,7 @@
       "subcategory": "silkstrand",
       "subcategoryLabel": "Silkstrand & the Velvet Court",
       "subcategoryOrder": 3,
-      "order": 3
+      "order": 4
     },
     {
       "id": "the_last_blade",
@@ -2518,7 +2532,7 @@
       "active": true
     }
   ],
-  "total_count": 172,
-  "active_count": 172,
+  "total_count": 173,
+  "active_count": 173,
   "_license": "Fate's Edge Copyright – © 2024 - 2026 Nicholas A. Gasper. Used with permission, All rights reserved."
 }
