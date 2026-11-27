@@ -1476,17 +1476,18 @@ const CROWN_TEMPLATE_MARKERS = [
 const CROWN_ALL_MARKERS = ['🌱', '🏔️', '👑', '🤝', '🌟', '⏱️', '♠️'];
 
 function parseCrownCardSegment(body) {
-    const segmentsMatch = body.match(/\((\d+)\s*segments if highest\)/i);
-    const tierSegments = segmentsMatch ? parseInt(segmentsMatch[1], 10) : null;
-
     const cardLabelMatch = body.match(/^([A-Za-z0-9]+ of [A-Za-z]+)/);
     const cardLabel = cardLabelMatch ? cardLabelMatch[1] : null;
+    const segmentsMatch = body.match(/\((\d+)-segment pressure clock\)/i);
+    const tierSegments = segmentsMatch && /\bof Clubs$/i.test(cardLabel || '')
+        ? parseInt(segmentsMatch[1], 10)
+        : null;
 
     const afterTierPrefix = body.replace(/^[^:]*:\s*/, '');
     const titleMatch = afterTierPrefix.match(/^([^:]{2,60}):\s*([\s\S]*)$/);
     const title = titleMatch ? titleMatch[1].trim() : null;
     let flavor = titleMatch ? titleMatch[2] : afterTierPrefix;
-    flavor = flavor.replace(/\(\d+\s*segments if highest\)\.?\s*$/i, '').trim();
+    flavor = flavor.replace(/\(\d+-segment pressure clock\)\.?\s*$/i, '').trim();
 
     return { cardLabel, title, flavor, tierSegments };
 }
@@ -1513,8 +1514,8 @@ function parseCrownSpreadSynthesis(text) {
         } else if (marker === '🌟') {
             wildcardText = rest.replace(/^Wildcard:\s*/i, '').trim();
         } else if (marker === '⏱️') {
-            const segMatch = rest.match(/suggests a timer of (\d+) segments/i);
-            const cardMatch = rest.match(/highest card \(([^)]+)\)/i);
+            const segMatch = rest.match(/sets a timer of (\d+) segments/i);
+            const cardMatch = rest.match(/The Club \(([^)]+)\)/i);
             if (segMatch) timerSegments = parseInt(segMatch[1], 10);
             if (cardMatch) timerCardLabel = cardMatch[1];
         } else if (marker === '♠️') {
@@ -1562,10 +1563,10 @@ function buildAdventureFromCrownSpread({ parsed, title, tier, region, cardNames 
     }] : [];
 
     const campaignTimers = parsed.timerSegments ? [{
-        name: `Adventure Clock (${parsed.timerCardLabel || 'highest card'})`,
+        name: `Adventure Clock (${parsed.timerCardLabel || 'Club'})`,
         segments: parsed.timerSegments,
         current: 0,
-        description: 'Derived from the highest non-wildcard card in the reading — the pressure driving this adventure.'
+        description: 'Derived from the Club card in the reading — its rank sets the pressure clock.'
     }] : [];
 
     const notesParts = [`Crown Spread reading — Region: ${region || 'Unknown'}. Cards: ${cardNames || 'Unknown'}.`];

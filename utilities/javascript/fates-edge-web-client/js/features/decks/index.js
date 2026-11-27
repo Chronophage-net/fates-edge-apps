@@ -38,8 +38,8 @@
  *
  * RANK TIERS (for timer segments):
  *   - 2–5: Minor → 4 segments
- *   - 6–9: Medium → 6 segments
- *   - 10–K: Major → 8 segments
+ *   - 6–10: Medium → 6 segments
+ *   - J–K: Major → 8 segments
  *   - A: Ace → 10 segments
  */
 
@@ -80,7 +80,7 @@ const SUIT_ARCHETYPES = {
     diamonds: { label: 'Reward/Leverage', desc: 'a resource, opportunity, or material gain' }
 };
 
-// Rank tier mapping for timer segments and fallback detail
+// Club rank determines the timer for a Crown Spread / travel leg.
 const RANK_TIERS = {
     '2': { tier: 'Minor', segments: 4 },
     '3': { tier: 'Minor', segments: 4 },
@@ -90,15 +90,21 @@ const RANK_TIERS = {
     '7': { tier: 'Medium', segments: 6 },
     '8': { tier: 'Medium', segments: 6 },
     '9': { tier: 'Medium', segments: 6 },
-    '10': { tier: 'Major', segments: 8 },
+    '10': { tier: 'Medium', segments: 6 },
     'J': { tier: 'Major', segments: 8 },
     'Q': { tier: 'Major', segments: 8 },
     'K': { tier: 'Major', segments: 8 },
     'A': { tier: 'Ace', segments: 10 }
 };
 
-const POKER_RANK = { 'A': 14, 'K': 13, 'Q': 12, 'J': 11, '10': 10, '9': 9, '8': 8, '7': 7, '6': 6, '5': 5, '4': 4, '3': 3, '2': 2 };
-const SUIT_ORDER = { 'spades': 4, 'hearts': 3, 'diamonds': 2, 'clubs': 1 };
+/** A Club sets the pressure clock; other suits never determine its size. */
+export function getTimerFromClubCard(card) {
+    if (!card || isJokerCard(card) || String(card.suit || '').toLowerCase() !== 'clubs') return null;
+    const tier = RANK_TIERS[String(card.rank || '').toUpperCase()];
+    if (!tier) return null;
+    const rankName = card.rankName || RANK_NAMES[String(card.rank).toUpperCase()] || card.rank;
+    return { segments: tier.segments, card: `${rankName} of Clubs` };
+}
 
 const DEFAULT_TWISTS = [
     "A sudden storm or environmental shift changes the scene.",
@@ -662,13 +668,13 @@ function getCardMeaningFromRegion(suit, rank, regionData) {
     if (!obj || !obj[rank]) {
         const tier = tierInfo.tier;
         const segments = tierInfo.segments;
-        return `${rankName} of ${suitName} (${archetype.label} – ${tier}): A ${archetype.label.toLowerCase()} arises. ${archetype.desc}. This card suggests a ${tier.toLowerCase()} influence (${segments}-segment clock if this is the highest card).`;
+        return `${rankName} of ${suitName} (${archetype.label} – ${tier}): A ${archetype.label.toLowerCase()} arises. ${archetype.desc}. This card suggests a ${tier.toLowerCase()} influence${suit === 'clubs' ? ` (${segments}-segment pressure clock)` : ''}.`;
     }
 
     const specific = obj[rank];
     const tier = tierInfo.tier;
     const segments = tierInfo.segments;
-    return `${rankName} of ${suitName} (${archetype.label} – ${tier}): ${specific} (${segments} segments if highest).`;
+    return `${rankName} of ${suitName} (${archetype.label} – ${tier}): ${specific}${suit === 'clubs' ? ` (${segments}-segment pressure clock)` : ''}.`;
 }
 
 /**
@@ -931,39 +937,12 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
     synthesis += `🤝 Left Hand: ${positionCards[3].regionMeaning || positionCards[3].description}\n\n`;
     synthesis += `${wildcardMeaning}`;
 
-    const nonWildcards = mainCards.filter(c => !isJokerCard(c));
-    let highest = null;
-    if (nonWildcards.length > 0) {
-        highest = nonWildcards.reduce((a, b) => {
-            const rankA = POKER_RANK[a.rank] || 0;
-            const rankB = POKER_RANK[b.rank] || 0;
-            if (rankA !== rankB) return rankA > rankB ? a : b;
-            const suitA = SUIT_ORDER[a.suit] || 0;
-            const suitB = SUIT_ORDER[b.suit] || 0;
-            return suitA > suitB ? a : b;
-        });
-    } else {
-        highest = mainCards[0];
-    }
-
-    let timer = null;
-    let timerCard = '';
-    if (highest && !isJokerCard(highest)) {
-        const rankVal = POKER_RANK[highest.rank] || 0;
-        let segments = 4;
-        if (rankVal === 14) segments = 10;      // Ace
-        else if (rankVal >= 10) segments = 8;   // 10,J,Q,K
-        else if (rankVal >= 6) segments = 6;    // 6-9
-        else segments = 4;                      // 2-5
-        timer = segments;
-        timerCard = `${highest.rankName} of ${highest.suitName}`;
-    } else if (highest) {
-        timer = 4;
-        timerCard = 'Joker (Twist)';
-    }
+    const timer = getTimerFromClubCard(mainCards.find(card => card.suit === 'clubs'));
 
     if (timer) {
-        synthesis += `\n\n⏱️ The highest card (${timerCard}) suggests a timer of ${timer} segments—a pressure that will build until it breaks.`;
+        synthesis += `\n\n⏱️ The Club (${timer.card}) sets a timer of ${timer.segments} segments—a pressure that will build until it breaks.`;
+    } else {
+        synthesis += '\n\n⏱️ No Club was drawn, so this spread sets no timer.';
     }
 
     const details = `
@@ -981,7 +960,7 @@ function synthesiseCrownSpread(mainCards, wildcard, regionData) {
     `;
 
     return {
-        synthesis, details, timer: timer ? { segments: timer, card: timerCard } : null,
+        synthesis, details, timer,
         positions: positionCards, wildcard: wildcardMeaning,
         horizontalLayout, verticalLayout
     };
@@ -1410,7 +1389,7 @@ async function performConsequenceDraw() {
     if (timer && timerEl) {
         timerEl.style.display = 'block';
         timerEl.innerHTML = `
-            <strong>⏱️ Suggested Timer:</strong> ${timer.segments} segments (from highest card: ${timer.card})
+            <strong>⏱️ Suggested Timer:</strong> ${timer.segments} segments (from Club: ${timer.card})
             <button class="btn btn-sm btn-primary" id="create-timer-btn" style="margin-inline-start:0.5rem;" data-i18n="feature.decks.addTimer">➕ Add Timer</button>
         `;
         const btn = timerEl.querySelector('#create-timer-btn');
@@ -1802,7 +1781,7 @@ export function openCrownSpread() {
 
                 ${result.timer ? `
                     <div style="margin-top:1rem;background:var(--bg3);border-radius:var(--radius);padding:0.5rem 1rem;border-inline-start:4px solid var(--gold);">
-                        <strong>⏱️ Suggested Timer:</strong> ${result.timer.segments} segments (from ${result.timer.card})
+                        <strong>⏱️ Suggested Timer:</strong> ${result.timer.segments} segments (from Club: ${result.timer.card})
                         <button class="btn btn-sm btn-primary" onclick="window.createTimerFromCard('${result.timer.card}', ${result.timer.segments})" style="margin-inline-start:0.5rem;">➕ Add Timer</button>
                     </div>
                 ` : ''}

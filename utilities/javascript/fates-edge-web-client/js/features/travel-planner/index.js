@@ -18,8 +18,9 @@
  *                              gate the route (often the destination, but
  *                              not always — a mountain pass into Viterra
  *                              might be gated by Ubral or Aeler instead).
- *   The highest-ranked card among the four sets the leg's timer (2-5 -> 4
- *   segments, 6-10 -> 6, J/Q/K -> 8, A -> 10 -- see "Rank and Severity").
+ *   The Club sets the leg's timer (2-5 -> 4 segments, 6-10 -> 6,
+ *   J/Q/K -> 8, A -> 10 -- see "Rank and Severity"). The highest card
+ *   sets the leg's theme.
  *   An Ace draws the Hollow's attention (+1 SB). A face card (J/Q/K) is a
  *   person or personified force with agency, not just a high number (see
  *   "Card Faces: The Court as Character").
@@ -820,16 +821,8 @@ function generateLeg(sources, legIndex) {
     const pressure = getCardMeaningFromRegion('clubs', club.rank, sources.clubData);
     const leverage = getCardMeaningFromRegion('diamonds', diamond.rank, sources.diamondData);
 
-    const highestRank = [spade, heart, club, diamond].reduce((a, b) => {
-        const rankA = POKER_RANK[a.rank] || 0;
-        const rankB = POKER_RANK[b.rank] || 0;
-        if (rankA !== rankB) return rankA > rankB ? a : b;
-        const suitA = SUIT_ORDER[a.suit] || 0;
-        const suitB = SUIT_ORDER[b.suit] || 0;
-        return suitA > suitB ? a : b;
-    });
-    const timerSegments = getTimerSizeFromRank(highestRank.rank);
-    const timerCard = `${getRankName(highestRank.rank)} of ${getSuitName(highestRank.suit)}`;
+    const timerSegments = getTimerSizeFromRank(club.rank);
+    const timerCard = `${getRankName(club.rank)} of Clubs`;
 
     // "Aces and the Ninth: The Hollow's Attention" -- any Ace in the draw
     // draws the Hollow's notice (GM gains 1 extra SB), separate from
@@ -1228,7 +1221,7 @@ export async function render(el) {
                 <div style="margin-top:0.5rem;font-size:0.85rem;color:var(--text2);">
                     Each leg draws one card per suit — Place (♠) and Actor (♥) from the destination; Pressure (♣) from the Wilds' general hazards
                     unless the route is strongly policed (then the destination); Leverage (♦) from whichever authority actually gates the route.
-                    The highest card sets a suggested timer.
+                    The Club's rank sets the suggested timer; the highest card sets the theme.
                     <span style="color:var(--gold);">♠️ Aces draw the Hollow's attention (+1 SB)!</span>
                 </div>
             </div>
@@ -1791,7 +1784,7 @@ function displayJourney(journey) {
             timerResult.style.display = 'block';
             timerResult.innerHTML = `
                 <strong>⏱️ Suggested Travel Timer:</strong> ${journey.totalSegments} segments 
-                (based on highest card per leg, combined).
+                (based on the Club card from each leg, combined).
                 <span style="font-size:0.8rem;color:var(--text3);">Click "Add Timer" to create.</span>
             `;
         } else {
