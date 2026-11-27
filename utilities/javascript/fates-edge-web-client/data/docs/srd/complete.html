@@ -1738,7 +1738,7 @@ number instead of describing the swing.</p>
 <ul>
 <li><strong>Free Caster (Spellcraft):</strong> Weave then Cast (2 actions). Push (mark Fatigue) to compress to 1 action. Casting while Engaged worsens Position by one step unless the spell has <code>[TOUCH]</code> or <code>[WARD]</code>.</li>
 <li><strong>Runekeeper (Rites):</strong> Invoke a Rite as 1 action; mark Obligation. Push It (+1 Obligation) for increased effect.</li>
-<li><strong>Invoker (Symbols):</strong> Ritual takes DV+1 rounds. Crack the Seal (instant) marks +2 Obligation (+3 for High Rites); Symbol becomes Compromised.</li>
+<li><strong>Invoker (Symbols):</strong> Ritual takes DV+1 rounds. Crack the Seal (instant) marks double the Rite's listed Obligation cost; if no cost is listed, mark 2 Obligation (3 for a High Rite); Symbol becomes Compromised.</li>
 <li><strong>Cantor (Songs):</strong> Sing a Song (1 action, resolves at start of next turn). Push to resolve immediately (mark Fatigue + advance Corruption).</li>
 </ul>
 </section>
@@ -2516,6 +2516,7 @@ number instead of describing the swing.</p>
 </section><section class="level1" id="magic-system">
 <h2>Magic System</h2>
 <p>Magic in Fate's Edge is expressed through six interconnected paths. Each uses the same core resolution engine (Position, DV, Boons, SB) but manages risk differently.</p>
+<p>These rules describe what characters can attempt and what it costs, not a complete account of reality. Practitioners can reproduce a working while disagreeing about its cause. Elements, Echoes, and thresholds are useful models; a successful ward or reading does not prove every part of its maker's theory.</p>
 <ul>
 <li><strong>Caster (Freeform):</strong> Flexible, improvisational magic. Risk of Backlash.</li>
 <li><strong>Runekeeper (Rites):</strong> Structured magic through a Patron's Codex. Risk of Obligation.</li>
@@ -2546,6 +2547,7 @@ number instead of describing the swing.</p>
 <section class="level2" id="caster-freeform">
 <h3>Caster (Freeform / Weave &amp; Cast)</h3>
 <p>Free casters shape raw magic by combining elements and effects. They are flexible but unpredictable.</p>
+<p>A narrow inborn gift may appear in the fiction without a Patron bond. It grants only its stated effect, not access to arbitrary tags or the whole free-casting path. For a player character, use the ability's specified talent or other explicit rules permission; the full Weave &amp; Cast procedure still requires Spellcraft.</p>
 <section class="level3" id="caster-requirements">
 <h4>Requirements</h4>
 <ul>
@@ -2613,19 +2615,20 @@ number instead of describing the swing.</p>
 <li>Display the Symbol (must be visible).</li>
 <li>Perform the Rite. Takes DV + 1 rounds (Significant Time), where DV is calculated as above.</li>
 <li>Mark the Rite's Obligation cost (listed).</li>
-<li>If the Symbol is displayed openly during the ritual, reduce the Obligation cost by 1 (minimum 0).</li>
+<li>If the Symbol is displayed openly during the ritual, reduce DV by 1 (minimum 1) and the Obligation cost by 1 (minimum 0). Use the adjusted DV for ritual time.</li>
 </ol>
 </section>
 <section class="level3" id="crack-the-seal-instant-cast">
 <h4>Crack the Seal (Instant Cast)</h4>
 <ol>
 <li>Invoke the Rite as 1 action (instead of ritual time).</li>
-<li>Mark double the Rite's Obligation cost (or +2 minimum, +3 for High Rites if the base cost is unclear).</li>
+<li>Mark double the Rite's listed Obligation cost; if no cost is listed, mark 2 Obligation (3 for a High Rite).</li>
 <li>The Symbol becomes Compromised (inert). Restore it during downtime (Arcana or Lore test, DV 3) or pay 1 XP.</li>
 </ol>
 </section>
 <section class="level3" id="borrowed-grace-invoker-talent">
 <h4>Borrowed Grace (Invoker Talent)</h4>
+<p><strong>Cost:</strong> 3–5 XP (minor talent).</p>
 <p>Once per scene, spend 1 Boon or 1 Fatigue (1 action) to gain +1 die on a combat action, or +1 Effect on a social or stealth action. Requires visibly displaying your Patron's Symbol. If the Symbol is Compromised, Borrowed Grace works at –1 die.</p>
 </section>
 </section>
@@ -2660,11 +2663,11 @@ number instead of describing the swing.</p>
 <li>Perform a Resonant Rite (a powerful thematic working designated by your Patron).</li>
 <li>The GM spends a Story Beat on your occult activities.</li>
 </ul>
-<p>When the timer fills, you immediately gain a thematic boon and burden from the last Patron whose Rite you performed. Then reset the timer to zero (cannot go below your current Tier − 1).</p>
+<p>When the timer fills, you immediately gain a thematic boon and burden from the last Patron whose Rite you performed. Then reset the marked segments to max(0, Tier − 1). The timer size remains Spirit; a reset does not remove earlier boons and burdens.</p>
 </section>
 <section class="level3" id="cantor-corruption-examples">
 <h4>Cantor Corruption Examples (The Eight Core Patrons)</h4>
-<p>When a Cantor's Corruption Timer fills, they immediately gain a thematic boon (benefit) and burden (drawback) from the last Patron whose Rite they performed. The timer resets to zero, but the mark of Corruption remains—a permanent change to the character's voice, manner, or soul. The examples below are for the eight patrons recommended for first characters. The GM and player should collaborate to create blooms that fit the fiction.</p>
+<p>When a Cantor's Corruption Timer fills, they immediately gain a thematic boon (benefit) and burden (drawback) from the last Patron whose Rite they performed. The timer resets to max(0, Tier − 1), but the mark of Corruption remains—a permanent change to the character's voice, manner, or soul. The examples below are for the eight patrons recommended for first characters. The GM and player should collaborate to create blooms that fit the fiction.</p>
 <div class="grid-2">
 <div class="panel panel-purple">
 <p><span class="badge badge-purple">Oath of Flame &amp; Light (Dawn &amp; Vows)</span></p>
@@ -2719,7 +2722,7 @@ number instead of describing the swing.</p>
 </section>
 <section class="level2" id="witchcraft-hedge-magic">
 <h3>Witchcraft (Hedge Magic)</h3>
-<p>Witchcraft is the magic of thresholds, knots, and small favors. It is subtle, low-cost, and accessible to any character who pays attention to the world's edges. Unlike other magical paths, Witchcraft requires no Patron, no Codex, and no resource track—just a talent and a willingness to work at the boundaries.</p>
+<p>Witchcraft is the magic of thresholds, knots, and small favors. It is subtle, low-cost, and accessible to any character who pays attention to the world's edges. Unlike other magical paths, hedge Witchcraft requires no Patron, no Codex, and no universal resource track—just a talent and a willingness to work at the boundaries. Optional Orders and self-altering workings may add their own prices; they do not impose those prices on the Hedge Gifts below.</p>
 <section class="level3" id="two-speeds-of-witchcraft">
 <h4>The Two Speeds of Witchcraft</h4>
 <p>Witchcraft operates at two speeds:</p>
@@ -2851,7 +2854,7 @@ number instead of describing the swing.</p>
 <ul>
 <li>Invoking a Rite (Runekeeper or Invoker): mark the Rite's listed Obligation cost (e.g., <code>Obligation: 6</code>).</li>
 <li>Pushing a Rite: mark +1 additional Obligation (added to the Rite's base cost).</li>
-<li>Crack the Seal: mark double the Rite's base cost (or +2 minimum, +3 for High Rites).</li>
+<li>Crack the Seal: mark double the Rite's listed Obligation cost; if no cost is listed, mark 2 Obligation (3 for a High Rite).</li>
 <li>Using Rites from two different Patrons in the same scene: mark +1 Obligation to the second Patron.</li>
 </ul>
 </section>
@@ -2901,7 +2904,7 @@ number instead of describing the swing.</p>
 <p><code>Timer Size = Spirit</code></p>
 <ul>
 <li>Mark a segment when you Push a Song, perform a Resonant Rite, or when the GM spends SB on your occult activities.</li>
-<li>When full: gain a thematic boon and burden from your last Patron; reset timer to zero.</li>
+<li>When full: gain a thematic boon and burden from your last Patron; reset marked segments to max(0, Tier − 1).</li>
 </ul>
 </section>
 </section><section class="level1" id="tags-effects">
@@ -3546,15 +3549,15 @@ number instead of describing the swing.</p>
 <ul>
 <li>Takes DV + 1 rounds to complete.</li>
 <li>Display the Symbol openly (visible).</li>
-<li>Always marks +1 Obligation to that Patron.</li>
-<li>If the Symbol is displayed, DV –1 and Obligation –1 (minimum 0 Obligation).</li>
+<li>Mark the Rite's listed Obligation cost to that Patron.</li>
+<li>If the Symbol is displayed, DV –1 (minimum 1) and Obligation –1 (minimum 0). Use the adjusted DV for ritual time.</li>
 </ul>
 </section>
 <section class="level3" id="crack-the-seal">
 <h4>Crack the Seal (Instant Cast)</h4>
 <p>Resolve the Rite immediately (1 action) by:</p>
 <ul>
-<li>Marking +2 Obligation (+3 for High Rites).</li>
+<li>Marking double the Rite's listed Obligation cost; if no cost is listed, mark 2 Obligation (3 for a High Rite).</li>
 <li>Setting the Symbol to Compromised (inert until restored).</li>
 <li>The GM may immediately spend 1 SB on a thematic complication.</li>
 </ul>
@@ -3562,7 +3565,7 @@ number instead of describing the swing.</p>
 <section class="level3" id="restoring-a-symbol">
 <h4>Restoring a Symbol</h4>
 <ul>
-<li>Requires a Downtime action.</li>
+<li>Restore during downtime with the test below, or pay 1 XP.</li>
 <li>Roll Wits + Arcana or Lore (DV 3).</li>
 <li><strong>Clean Success:</strong> Symbol returns to Maintained.</li>
 <li><strong>Partial:</strong> Symbol becomes Neglected (future rituals +1 Obligation).</li>
@@ -3674,7 +3677,7 @@ number instead of describing the swing.</p>
 </section>
 <section class="level2" id="obligation-and-invokers">
 <h3>Obligation and Invokers</h3>
-<p>Invokers track Obligation per Patron. Each ritual invocation marks +1 Obligation (reduced by displaying the Symbol). Crack the Seal marks +2 Obligation (+3 for High Rites). Obligation Capacity = Spirit + Presence. Exceeding capacity causes Fatigue.</p>
+<p>Invokers track Obligation per Patron. Each ritual invocation marks the Rite's listed cost, reduced by 1 for openly displaying the Symbol (minimum 0). Crack the Seal marks double the Rite's listed Obligation cost; if no cost is listed, mark 2 Obligation (3 for a High Rite). Obligation Capacity = Spirit + Presence. Exceeding capacity causes Fatigue.</p>
 </section>
 <section class="level2" id="ritual-interruption-and-counterplay">
 <h3>Ritual Interruption and Counterplay</h3>
@@ -4873,7 +4876,7 @@ number instead of describing the swing.</p>
 </div>
 </section>
 <h4>B.1 Runekeeper Rites (by Patron)</h4>
-<p>Runekeepers learn Rites from their Codex. Each Rite is invoked as 1 action and marks Obligation (+1 standard, +2 for Push).</p>
+<p>Runekeepers learn Rites from their Codex. Each Rite is invoked as 1 action and marks its listed Obligation cost; Push adds 1 Obligation.</p>
 <h5 class="text-sm text-muted">B.1.1 The Sealed Gate (Thresholds, Wards, Binding)</h5>
 <section class="level2" id="sealed-threshold">
 <h3>Sealed Threshold</h3>
@@ -4941,7 +4944,7 @@ number instead of describing the swing.</p>
 </div>
 </section>
 <h4>B.2 Invoker Rituals (by Symbol)</h4>
-<p>Invokers perform rituals using a Patron’s Symbol. Rituals take DV+1 rounds and always mark +1 Obligation. Crack the Seal (instant) marks +2 Obligation (+3 for High) and renders the Symbol Compromised.</p>
+<p>Invokers perform rituals using a Patron’s Symbol. Rituals take DV+1 rounds and mark the Rite's listed Obligation, reduced by 1 for displaying the Symbol (minimum 0). Crack the Seal resolves instantly and renders the Symbol Compromised. Mark double the Rite's listed Obligation cost; if no cost is listed, mark 2 Obligation (3 for a High Rite).</p>
 <section class="level2" id="oath-ward-invoker">
 <h3>Oath-Ward</h3>
 <div class="panel panel-orange">

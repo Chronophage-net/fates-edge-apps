@@ -22,6 +22,7 @@
 </style></head><body><main class="srd-book" id="main-content"><p class="chapter-label">FATE’S EDGE · SYSTEM REFERENCE DOCUMENT</p><h1>Magic: choosing and using a path</h1><p>Read the overview first, then the path your character actually uses. You do not need to learn every tradition before playing one. Follow the links to the tag library, rites, summoning, and worked examples when your chosen path calls for them. All printed costs, prerequisites, and consequences still apply.</p><nav aria-label="SRD chapters"><a href="index.html">Start here: the core mechanic</a><a href="characters.html">Character creation and advancement</a><a href="combat.html">Equipment, combat, and recovery</a><a href="running-the-game.html">Running the game</a><a href="talents.html">Talent reference</a><a href="magic.html">Magic: choosing and using a path</a><a href="tags.html">Magic tags and effects</a><a href="rites-and-summoning.html">Rites, invokers, and summoning</a><a href="crafting.html">Crafting: projects and upkeep</a><a href="followers-and-assets.html">Followers and assets</a><a href="travel.html">Travel framework</a><a href="optional-tools.html">Optional campaign tools</a><a href="quick-reference.html">Tables for use during play</a><a href="examples.html">Example spells and characters</a><a href="legacy-references.html">Earlier section numbers</a><a href="license.html">License</a><a href="complete.html">Complete reference</a></nav><div data-srd-rules><section class="level1" id="magic-system">
 <h2>Magic System</h2>
 <p>Magic in Fate's Edge is expressed through six interconnected paths. Each uses the same core resolution engine (Position, DV, Boons, SB) but manages risk differently.</p>
+<p>These rules describe what characters can attempt and what it costs, not a complete account of reality. Practitioners can reproduce a working while disagreeing about its cause. Elements, Echoes, and thresholds are useful models; a successful ward or reading does not prove every part of its maker's theory.</p>
 <ul>
 <li><strong>Caster (Freeform):</strong> Flexible, improvisational magic. Risk of Backlash.</li>
 <li><strong>Runekeeper (Rites):</strong> Structured magic through a Patron's Codex. Risk of Obligation.</li>
@@ -52,6 +53,7 @@
 <section class="level2" id="caster-freeform">
 <h3>Caster (Freeform / Weave &amp; Cast)</h3>
 <p>Free casters shape raw magic by combining elements and effects. They are flexible but unpredictable.</p>
+<p>A narrow inborn gift may appear in the fiction without a Patron bond. It grants only its stated effect, not access to arbitrary tags or the whole free-casting path. For a player character, use the ability's specified talent or other explicit rules permission; the full Weave &amp; Cast procedure still requires Spellcraft.</p>
 <section class="level3" id="caster-requirements">
 <h4>Requirements</h4>
 <ul>
@@ -119,19 +121,20 @@
 <li>Display the Symbol (must be visible).</li>
 <li>Perform the Rite. Takes DV + 1 rounds (Significant Time), where DV is calculated as above.</li>
 <li>Mark the Rite's Obligation cost (listed).</li>
-<li>If the Symbol is displayed openly during the ritual, reduce the Obligation cost by 1 (minimum 0).</li>
+<li>If the Symbol is displayed openly during the ritual, reduce DV by 1 (minimum 1) and the Obligation cost by 1 (minimum 0). Use the adjusted DV for ritual time.</li>
 </ol>
 </section>
 <section class="level3" id="crack-the-seal-instant-cast">
 <h4>Crack the Seal (Instant Cast)</h4>
 <ol>
 <li>Invoke the Rite as 1 action (instead of ritual time).</li>
-<li>Mark double the Rite's Obligation cost (or +2 minimum, +3 for High Rites if the base cost is unclear).</li>
+<li>Mark double the Rite's listed Obligation cost; if no cost is listed, mark 2 Obligation (3 for a High Rite).</li>
 <li>The Symbol becomes Compromised (inert). Restore it during downtime (Arcana or Lore test, DV 3) or pay 1 XP.</li>
 </ol>
 </section>
 <section class="level3" id="borrowed-grace-invoker-talent">
 <h4>Borrowed Grace (Invoker Talent)</h4>
+<p><strong>Cost:</strong> 3–5 XP (minor talent).</p>
 <p>Once per scene, spend 1 Boon or 1 Fatigue (1 action) to gain +1 die on a combat action, or +1 Effect on a social or stealth action. Requires visibly displaying your Patron's Symbol. If the Symbol is Compromised, Borrowed Grace works at –1 die.</p>
 </section>
 </section>
@@ -166,11 +169,11 @@
 <li>Perform a Resonant Rite (a powerful thematic working designated by your Patron).</li>
 <li>The GM spends a Story Beat on your occult activities.</li>
 </ul>
-<p>When the timer fills, you immediately gain a thematic boon and burden from the last Patron whose Rite you performed. Then reset the timer to zero (cannot go below your current Tier − 1).</p>
+<p>When the timer fills, you immediately gain a thematic boon and burden from the last Patron whose Rite you performed. Then reset the marked segments to max(0, Tier − 1). The timer size remains Spirit; a reset does not remove earlier boons and burdens.</p>
 </section>
 <section class="level3" id="cantor-corruption-examples">
 <h4>Cantor Corruption Examples (The Eight Core Patrons)</h4>
-<p>When a Cantor's Corruption Timer fills, they immediately gain a thematic boon (benefit) and burden (drawback) from the last Patron whose Rite they performed. The timer resets to zero, but the mark of Corruption remains—a permanent change to the character's voice, manner, or soul. The examples below are for the eight patrons recommended for first characters. The GM and player should collaborate to create blooms that fit the fiction.</p>
+<p>When a Cantor's Corruption Timer fills, they immediately gain a thematic boon (benefit) and burden (drawback) from the last Patron whose Rite they performed. The timer resets to max(0, Tier − 1), but the mark of Corruption remains—a permanent change to the character's voice, manner, or soul. The examples below are for the eight patrons recommended for first characters. The GM and player should collaborate to create blooms that fit the fiction.</p>
 <div class="grid-2">
 <div class="panel panel-purple">
 <p><span class="badge badge-purple">Oath of Flame &amp; Light (Dawn &amp; Vows)</span></p>
@@ -225,7 +228,7 @@
 </section>
 <section class="level2" id="witchcraft-hedge-magic">
 <h3>Witchcraft (Hedge Magic)</h3>
-<p>Witchcraft is the magic of thresholds, knots, and small favors. It is subtle, low-cost, and accessible to any character who pays attention to the world's edges. Unlike other magical paths, Witchcraft requires no Patron, no Codex, and no resource track—just a talent and a willingness to work at the boundaries.</p>
+<p>Witchcraft is the magic of thresholds, knots, and small favors. It is subtle, low-cost, and accessible to any character who pays attention to the world's edges. Unlike other magical paths, hedge Witchcraft requires no Patron, no Codex, and no universal resource track—just a talent and a willingness to work at the boundaries. Optional Orders and self-altering workings may add their own prices; they do not impose those prices on the Hedge Gifts below.</p>
 <section class="level3" id="two-speeds-of-witchcraft">
 <h4>The Two Speeds of Witchcraft</h4>
 <p>Witchcraft operates at two speeds:</p>
@@ -357,7 +360,7 @@
 <ul>
 <li>Invoking a Rite (Runekeeper or Invoker): mark the Rite's listed Obligation cost (e.g., <code>Obligation: 6</code>).</li>
 <li>Pushing a Rite: mark +1 additional Obligation (added to the Rite's base cost).</li>
-<li>Crack the Seal: mark double the Rite's base cost (or +2 minimum, +3 for High Rites).</li>
+<li>Crack the Seal: mark double the Rite's listed Obligation cost; if no cost is listed, mark 2 Obligation (3 for a High Rite).</li>
 <li>Using Rites from two different Patrons in the same scene: mark +1 Obligation to the second Patron.</li>
 </ul>
 </section>
@@ -407,7 +410,7 @@
 <p><code>Timer Size = Spirit</code></p>
 <ul>
 <li>Mark a segment when you Push a Song, perform a Resonant Rite, or when the GM spends SB on your occult activities.</li>
-<li>When full: gain a thematic boon and burden from your last Patron; reset timer to zero.</li>
+<li>When full: gain a thematic boon and burden from your last Patron; reset marked segments to max(0, Tier − 1).</li>
 </ul>
 </section>
 </section></div><p>Continue: <a href="tags.html">Magic tags and effects</a></p></main></body></html>

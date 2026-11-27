@@ -124,6 +124,7 @@
 <p><em> “You have a student who wants to cast <code>[GATE]</code> into a room they have never seen. They have three dice, no witnesses, and a history of minor backlashes. Do you let them? Yes. Do you warn them? No. The Weave will do the warning.” — Lysandra of the Amber Gate, <em>The Threadweaver’s Spellbook</em></em></p>
 </blockquote>
 <p>In <strong>Fate’s Edge</strong>, magic is not a clean art practiced in sterile towers. It is a <strong>dangerous negotiation with forces beyond mortal comprehension</strong>. As the GM, your role is to make magic <strong>feel weighty</strong>, <strong>thematic</strong>, and <strong>alive with risk</strong>. This chapter provides tools for adjudicating magical actions, managing consequences, and keeping the story at the forefront.</p>
+<p>These rules describe what characters can attempt and what it costs, not a complete account of reality. Practitioners can reproduce a working while disagreeing about its cause. Elements, Echoes, and thresholds are useful models; a successful ward or reading does not prove every part of its maker’s theory.</p>
 <p><em>For player-facing rules (spellcasting, Rites, Invoker symbols, Cantor songs, etc.), see Chapter 4 (Magic) of the Player’s Guide. This chapter focuses on your role as GM.</em></p>
 <section class="level3" id="sec:gm-magic-philosophy">
 <h2 id="the-role-of-magic-in-your-game">The Role of Magic in Your Game</h2>
@@ -195,7 +196,7 @@
 <h2 id="adjudicating-magic-at-the-table">Adjudicating Magic at the Table</h2>
 <section class="level4 unnumbered" id="setting-difficulty-value-dv-and-position">
 <h3 class="unnumbered">Setting Difficulty Value (DV) and Position</h3>
-<p>Use the standard DV ladder (2–5+), but consider magical specifics:</p>
+<p>Use the path’s procedure first: free-casting DV is 1 + tag costs (dangerous tags add 2 instead of 1); Rite DV is the greater of listed Obligation minus Spirit and Rite tier. The scope examples below help frame the fiction, not replace those formulas:</p>
 <blockquote>
 <p><strong>DV for Magic</strong></p>
 <div aria-label="Scrollable reference table" class="fe-table-scroll" data-fe-reader-wrapper="table" role="region" tabindex="0"><table>
@@ -232,7 +233,7 @@
 <li><p><strong>Controlled:</strong> Standard casting under normal conditions.</p></li>
 <li><p><strong>Desperate:</strong> Caster is wounded, rushed, or in an anti-magic zone.</p></li>
 </ul>
-<p>Position affects the severity of backlash (see <a href="GM-_-Guide-_-05-_-Magic-_-and-_-Backlash.html#subsec:backlash-severity">Magic and Backlash</a>).</p>
+<p>For free casting, apply the SRD Backlash triggers: Partial, Miss, or a Hit with at least two 1s. Take one menu consequence on a Partial and two on a Miss; the element colors the fallout. Position and additional SB spends can shape consequences as described below, without replacing these triggers.</p>
 </section>
 </section>
 <section class="level4 unnumbered" id="subsec:dv-spell-scope">
@@ -606,7 +607,7 @@
 <h5>Example:</h5>
 <p>The player succeeds on a ritual to divine an enemy’s location. The roll generates 2 SB. The GM spends them:</p>
 <blockquote>
-<p>“You see the enemy’s camp clearly – but your Patron’s symbol glows hot on your hand. <strong>You can have the vision for free, or you can let the spell fizzle and keep your Obligation unchanged.</strong> If you accept the vision, mark +2 Obligation and your Patron will demand a task. What do you choose?”</p>
+<p>“You see the enemy’s camp clearly – but your Patron’s symbol glows hot on your hand. <strong>You can accept the vision at an extra 2 Obligation, or let the spell fizzle without that additional debt.</strong> If you accept the vision, mark +2 Obligation and your Patron will demand a task. What do you choose?”</p>
 </blockquote>
 <p>This turns a success into a narrative fork, not a punishment.</p>
 </section>
@@ -695,7 +696,7 @@
 <p>When a character exceeds their Obligation Capacity (Spirit + Presence):</p>
 <ul>
 <li><p>For each segment over capacity, mark 1 Fatigue (player does this).</p></li>
-<li><p>If they exceed <strong>double capacity</strong>, clear all Fatigue, mark Harm 1, and trigger a <strong>Patron Intrusion</strong> – a narrative demand or complication from the Patron.</p></li>
+<li><p>They cannot invoke new Rites or perform Patron rituals until Obligation is reduced below Capacity. Do not clear Fatigue merely because debt rises further; normal Fatigue overflow still applies.</p></li>
 </ul>
 <section class="level6" id="examples-of-patron-intrusions">
 <h5>Examples of Patron Intrusions</h5>
@@ -709,10 +710,10 @@
 </section>
 <section class="level4 unnumbered" id="corruption-as-a-narrative-track">
 <h3 class="unnumbered">Corruption as a Narrative Track</h3>
-<p>Corruption (Cantors, Pact-Whisperers) fills from pushes, resonant rites, and your SB spends. When the timer fills (see <a href="GM-_-Guide-_-05-_-Magic-_-and-_-Backlash.html#subsec:corruption-blooms">Magic and Backlash</a>):</p>
+<p>A Cantor’s Corruption timer fills from Song pushes, resonant rites, and occult SB spends. Other paths mark Corruption only when their own rules call for it. When the timer fills (see <a href="GM-_-Guide-_-05-_-Magic-_-and-_-Backlash.html#subsec:corruption-blooms">Magic and Backlash</a>):</p>
 <ul>
 <li><p>Apply the Patron’s “benefit and burden” (see Patron tables in Chapter 13 (World Powers and Obligation) of the Player’s Guide).</p></li>
-<li><p>Reset the timer to the character’s Tier minimum.</p></li>
+<li><p>Reset marked segments to max(0,Tier-1); the timer size remains Spirit.</p></li>
 <li><p>If the player chooses <strong>Embrace Corruption</strong>, give them a permanent thematic quirk (not a pure penalty).</p></li>
 </ul>
 </section>
@@ -787,7 +788,7 @@
 <p>Cantors use Songs (Low Rites) with a Corruption Timer. Your main tasks:</p>
 <ul>
 <li><p>Track the Corruption Timer only when the player marks it (they manage it per the Player’s Guide).</p></li>
-<li><p>On a fill, impose the last Patron’s benefit &amp; burden (from the Patron tables in Chapter 13 (World Powers and Obligation) of the Player’s Guide). Remember that the player then <strong>sets their current Corruption segments to their Tier</strong> (minimum 1). This means high-Tier Cantors always carry a trace of past blooms – use that as a story hook.</p></li>
+<li><p>On a fill, impose the last Patron’s benefit &amp; burden (from the Patron tables in Chapter 13 (World Powers and Obligation) of the Player’s Guide). Reset marked segments to max(0,Tier-1) while keeping the timer size equal to Spirit. The boon and burden persist even after a Tier 1 reset to zero; use those lasting changes as story hooks.</p></li>
 <li><p>Spend SB to represent social fallout, Patron omens, or magical residue from their performances. For example, a Cantor who Pushes a song in a crowded tavern might generate a rumor timer or attract the attention of a witch-hunter.</p></li>
 </ul>
 <section class="level4 unnumbered" id="subsec:inspire-chorus">
@@ -872,7 +873,7 @@
 </section>
 <section class="level3" id="sec:rituals-gm">
 <h2 id="ritual-magic-gm-advice">Ritual Magic (GM Advice)</h2>
-<p>Rituals are powerful but slow. Use them for effects that are too big for a single roll.</p>
+<p>Large bespoke rituals can require lengthy preparation. The timings below are guidance for those workings; an ordinary Invoker Rite still takes DV + 1 rounds, or 1 action with Crack the Seal.</p>
 <section class="level4 unnumbered" id="setting-dv-for-rituals">
 <h3 class="unnumbered">Setting DV for Rituals</h3>
 <ul>
@@ -897,7 +898,7 @@
 <p><strong>Components as Devotion (Even with a Symbol/Codex/Thiasos)</strong></p>
 <p> A common player question: “I already have a Patron’s Symbol / Codex / Thiasos – why should I hunt for rare components?”</p>
 <p><strong>Answer:</strong> Because components are <strong>offerings</strong>. They show the Patron that you are willing to invest time, resources, and risk. Even when a Symbol or Codex technically allows a ritual without physical materials, <strong>acquiring components voluntarily can reduce Obligation or earn the Patron’s favor</strong>.</p>
-<p>Use this rule of thumb:</p>
+<p>These are optional offering bargains, agreed before casting; they do not automatically reduce the SRD’s listed costs:</p>
 <ul>
 <li><p><strong>Ritual with no components (just Symbol/Codex):</strong> Normal DV, normal Obligation cost.</p></li>
 <li><p><strong>Ritual with common components (herbs, salt, a candle):</strong> Reduce Obligation by 1 (minimum 0).</p></li>

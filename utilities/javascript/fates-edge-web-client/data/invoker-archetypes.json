@@ -2,7 +2,7 @@
   "_comment": "Invoker archetypes: named Symbol combinations for the professional practitioner — the ward-setter with a shingle, the exorcist with a bag, the stage conjuror with a license. Each is built on ONE canonical rivalry from patron-rivalries.json, so the character's central tension is already in the Cross-Resonance table, plus a third Symbol that complicates it. Three Symbols is 12 XP and deliberately one short of the four that would tax every scene.",
   "design_note": {
     "title": "Reading an Archetype",
-    "text": "An archetype is not a class. It is a purchase order: which Symbols to buy, in what order, and what the friction between them will cost you. Everything here resolves with the rules already in this guide — Symbols are 4 XP Minor Assets, invocation marks Obligation, displaying the Symbol buys DV −1 and Obligation −1, Crack the Seal buys instant resolution for +2 Obligation and a Compromised Symbol, and Obligation Capacity is Spirit + Presence. Nothing below adds a subsystem.",
+    "text": "An archetype is not a class. It is a purchase order: which Symbols to buy, in what order, and what the friction between them will cost you. Everything here resolves with the rules already in this guide — Symbols are 4 XP Minor Assets, invocation marks Obligation, displaying the Symbol buys DV −1 and Obligation −1, Crack the Seal buys instant resolution for double the Rite's listed Obligation (if unlisted, 2 or 3 for a High Rite) and a Compromised Symbol, and Obligation Capacity is Spirit + Presence. Nothing below adds a subsystem.",
     "bullets": [
       "<strong>Three, not four.</strong> Each archetype names three Symbols: 12 XP total, and one short of the four that make the first rite of every scene cost an extra Obligation. The fourth Symbol is available and is always a decision, never a bargain.",
       "<strong>The spine is a rivalry.</strong> Two of the three Symbols are listed rivals in the Cross-Resonance table. Displaying one while invoking the other is Position one step worse and +1 Obligation. That is not a flaw in the build; it is the build.",
@@ -49,7 +49,7 @@
       },
       "signature": {
         "name": "Crack Your Own Seal",
-        "text": "The move the trade is named for. A Doorwright who hung the ward knows where it is thin, and may Crack the Seal on their own Sealed Gate Symbol to open a boundary they themselves set — instant, +2 Obligation, Symbol Compromised, and the GM gets an SB on the way through. The house they are burgling is usually a house they were paid to protect last season. The client is usually still alive."
+        "text": "The move the trade is named for. A Doorwright who hung the ward knows where it is thin, and may Crack the Seal on their own Sealed Gate Symbol to open a boundary they themselves set — instant, double listed Obligation (if unlisted, 2 or 3 for High), Symbol Compromised, and the GM gets an SB on the way through. The house they are burgling is usually a house they were paid to protect last season. The client is usually still alive."
       },
       "when_it_goes_wrong": "A Compromised Sealed Gate Symbol is an inert ward on the Doorwright's own door. Enemies learn this. The classic disaster is not the job going badly; it is the job going fine and the practitioner coming home to a threshold that no longer objects to visitors.",
       "hooks": [
